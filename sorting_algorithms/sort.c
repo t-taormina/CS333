@@ -7,20 +7,59 @@ int
 bubble_sort(int argc, unsigned long *args) 
 {
   if (argc <= 1)
-    return 0;
+    return 2;
+
+  // Sort here
+  
   printf("Array: ");
   for (int i = 0; i < argc; i++) {
     printf("%ld ", args[i]);
   }
-
-
-  args[0] = 4;
-  args[1] = 5;
-  args[2] = 6;
-
-  printf("\n");
-  return 1;
+  return 0;
 }
 
+int 
+merge_sort(int argc, unsigned long *args) 
+{
+  if (argc <= 1)
+    return 2;
 
+  // Sort here
+
+  printf("Array: ");
+  for (int i = 0; i < argc; i++) {
+    printf("%ld ", args[i]);
+  }
+  return 0;
+}
+
+int 
+insertion_sort(int argc, unsigned long *args) 
+{
+  if (argc <= 1)
+    return 2;
+
+  // Sort here
+
+  printf("Array: ");
+  for (int i = 0; i < argc; i++) {
+    printf("%ld ", args[i]);
+  }
+  return 0;
+}
+
+int 
+tim_sort(int argc, unsigned long *args) 
+{
+  if (argc <= 1)
+    return 2;
+
+  // Sort here
+
+  printf("Array: ");
+  for (int i = 0; i < argc; i++) {
+    printf("%ld ", args[i]);
+  }
+  return 0;
+}
 

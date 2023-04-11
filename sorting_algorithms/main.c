@@ -27,16 +27,10 @@ main(int argc, char **argv)
     nums[j] = n;
     j++;
   }
-  unsigned long *nums_ptr = nums;
 
+  unsigned long *nums_ptr = nums;
   bubble_sort(argc - 1, nums_ptr);
 
-  printf("\n");
-  for (int k = 0; k < argc - 1; k++) {
-    printf("%ld ", nums[k]);
-  }
-
-  printf("\n");
   exit(EXIT_SUCCESS);
 }
 
