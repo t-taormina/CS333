@@ -17,19 +17,20 @@ main(int argc, char **argv)
 {
   if (argc < 2) {
     printf("Needs argument provided on command line.\n");
-  }
+ }
 
-  unsigned long nums[argc - 1];
+  int nums[argc - 1];
+  // int *nums_ptr = nums;
   int j = 0;
   for (int i = 1; i < argc; i++) {
-    unsigned long n;
-    n = strtol(argv[i], NULL, 10);
+    int n;
+    n = atoi(argv[i]);
     nums[j] = n;
     j++;
   }
 
-  unsigned long *nums_ptr = nums;
-  bubble_sort(argc - 1, nums_ptr);
+  bubble_sort(argc - 1, nums);
+  bubble_sort(argc - 1, nums);
 
   exit(EXIT_SUCCESS);
 }

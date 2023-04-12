@@ -4,7 +4,7 @@
 #include "sort.h"
 
 int 
-bubble_sort(int argc, unsigned long *args) 
+bubble_sort(int argc, int *args) 
 {
   if (argc <= 1)
     return 2;
@@ -13,8 +13,9 @@ bubble_sort(int argc, unsigned long *args)
   
   printf("Array: ");
   for (int i = 0; i < argc; i++) {
-    printf("%ld ", args[i]);
+    printf("%d ", args[i]);
   }
+  printf("\n");
   return 0;
 }
 
@@ -30,6 +31,7 @@ merge_sort(int argc, unsigned long *args)
   for (int i = 0; i < argc; i++) {
     printf("%ld ", args[i]);
   }
+  printf("\n");
   return 0;
 }
 
@@ -45,6 +47,7 @@ insertion_sort(int argc, unsigned long *args)
   for (int i = 0; i < argc; i++) {
     printf("%ld ", args[i]);
   }
+  printf("\n");
   return 0;
 }
 
@@ -60,6 +63,7 @@ tim_sort(int argc, unsigned long *args)
   for (int i = 0; i < argc; i++) {
     printf("%ld ", args[i]);
   }
+  printf("\n");
   return 0;
 }
 

@@ -14,3 +14,6 @@ sort.o : sort.c
 
 clean :
 	rm sort $(OBJECTS)
+
+open : 
+	vim *.c *.h Makefile -p
