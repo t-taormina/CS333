@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <unistd.h>
 #include <time.h>
 #include <grp.h>
 #include <pwd.h>
@@ -21,6 +22,7 @@
 #endif // TRUE
 
 #define BUF_SIZE 50000
+#define DNE "DOES_NOT_EXIST"
 
 #ifdef NOISY_DEBUG
 # define NOISY_DEBUG_PRINT fprintf(stderr, "%s %s %d\n", __FILE__, __func__, __LINE__)
@@ -28,6 +30,7 @@
 # define NOISY_DEBUG_PRINT
 #endif // NOISY_DEBUG
       
+int *conv_octal(int);
 
 int
 main(int argc, char **argv)
@@ -57,7 +60,6 @@ main(int argc, char **argv)
       case S_IFSOCK: printf("socket\n");                  break;
       case S_IFLNK:
                      char *buf;
-                     char empbuf[] = "DOES_NOT_EXIST";
                      ssize_t bufsize, nbytes;
                      bufsize = sb.st_size;
                      if (sb.st_size == 0) {
@@ -73,7 +75,7 @@ main(int argc, char **argv)
                        perror("readlink");
                        exit(EXIT_FAILURE);
                      }
-                     if (strcmp(buf, empbuf) == 0) {
+                     if (strcmp(buf, DNE) == 0) {
                        printf("Symbolic link - with dangling destination\n");
                      }
                      else {
@@ -85,16 +87,18 @@ main(int argc, char **argv)
       default:       printf("unknown\n");                 break;
     }
 
-    printf("  Device ID number:         %xh/%dd\n",
-      minor(sb.st_dev),
-      (int) major(sb.st_dev));
-      //(uintmax_t) minor(sb.st_dev),
-      //(uintmax_t) major(sb.st_dev));
+    printf("  Device ID number:         %jxh/%jdd\n",
+      (uintmax_t) minor(sb.st_dev),
+      (uintmax_t) minor(sb.st_dev));
+      //minor(sb.st_dev),
+      //major(sb.st_dev));
 
     printf("  I-node number:            %ju\n", (uintmax_t) sb.st_ino);
 
-    printf("  Mode:                     %o (octal)\n",
-        (uint) sb.st_mode);
+    int *omode;
+    omode = conv_octal(sb.st_mode);
+    printf("  Mode:                     (%d%d%d in octal)\n",
+        omode[5], omode[6], omode[7]);
 
     printf("  Link count:               %ju\n", (uintmax_t) sb.st_nlink);
 
@@ -124,5 +128,16 @@ main(int argc, char **argv)
 }
 
 
+int 
+*conv_octal(int number)
+{
+  static int nums[8];
+  int i, j;
+  for (i = 0, j = 7; number > 0; ++i) {
+    nums[j-i] = number % 8;
+    number = number / 8;
+  }
+  return nums;
+}
 
 
