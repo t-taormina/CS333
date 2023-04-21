@@ -22,6 +22,7 @@
 #endif // TRUE
 
 #define BUF_SIZE 50000
+#define O_BUF 8
 #define DNE "DOES_NOT_EXIST"
 
 #ifdef NOISY_DEBUG
@@ -31,6 +32,7 @@
 #endif // NOISY_DEBUG
       
 int *conv_octal(int);
+char *conv_omode(int*, char);
 
 int
 main(int argc, char **argv)
@@ -50,14 +52,27 @@ main(int argc, char **argv)
     printf("File: %s\n", argv[i]);
 
     printf("  File type:                ");
+    char ld_mode;
 
     switch (sb.st_mode & S_IFMT) {
-      case S_IFBLK:  printf("block device\n");            break;
-      case S_IFCHR:  printf("character device\n");        break;
-      case S_IFDIR:  printf("directory\n");               break;
-      case S_IFIFO:  printf("FIFO/pipe\n");               break;
-      case S_IFREG:  printf("regular file\n");            break;
-      case S_IFSOCK: printf("socket\n");                  break;
+      case S_IFBLK:  printf("block device\n");            
+                     ld_mode = 'b';
+                     break;
+      case S_IFCHR:  printf("character device\n");        
+                     ld_mode = 'c';
+                     break;
+      case S_IFDIR:  printf("directory\n");               
+                     ld_mode = 'd';
+                     break;
+      case S_IFIFO:  printf("FIFO/pipe\n");               
+                     ld_mode = 'p';
+                     break;
+      case S_IFREG:  printf("regular file\n");
+                     ld_mode = '-';
+                     break;
+      case S_IFSOCK: printf("socket\n");
+                     ld_mode = 's';
+                     break;
       case S_IFLNK:
                      char *buf;
                      ssize_t bufsize, nbytes;
@@ -82,7 +97,8 @@ main(int argc, char **argv)
                        printf("Symbolic link -> %.*s\n", (int) nbytes, buf);
                      }
                      free(buf);
-                                                          break;
+                     ld_mode = 'l';
+                     break;
 
       default:       printf("unknown\n");                 break;
     }
@@ -95,10 +111,12 @@ main(int argc, char **argv)
 
     printf("  I-node number:            %ju\n", (uintmax_t) sb.st_ino);
 
-    int *omode;
-    omode = conv_octal(sb.st_mode);
-    printf("  Mode:                     (%d%d%d in octal)\n",
-        omode[5], omode[6], omode[7]);
+    int *oct_mode;
+    char *str_mode;
+    oct_mode = conv_octal(sb.st_mode);
+    str_mode = conv_omode(oct_mode, ld_mode);
+    printf("  Mode:                     %s        (%d%d%d in octal)\n",
+        str_mode, oct_mode[5], oct_mode[6], oct_mode[7]);
 
     printf("  Link count:               %ju\n", (uintmax_t) sb.st_nlink);
 
@@ -131,7 +149,7 @@ main(int argc, char **argv)
 int 
 *conv_octal(int number)
 {
-  static int nums[8];
+  static int nums[O_BUF];
   int i, j;
   for (i = 0, j = 7; number > 0; ++i) {
     nums[j-i] = number % 8;
@@ -140,4 +158,61 @@ int
   return nums;
 }
 
+char 
+*conv_omode(int *arr, char lead)
+{
+  static char str_mode[10];
+  str_mode[0] = lead;
+  int i, j;
+  for (i = 5; i < O_BUF; ++i) {
+    if (i == 5) j = 1;
+    if (i == 6) j = 4;
+    if (i == 7) j = 7;
+    switch (arr[i]) {
+      case 0:
+        str_mode[j] =   '-';
+        str_mode[j+1] = '-';
+        str_mode[j+2] = '-';
+        break;
+      case 1:
+        str_mode[j] =   '-';
+        str_mode[j+1] = '-';
+        str_mode[j+2] = 'x';
+        break;
+      case 2:
+        str_mode[j] =   '-';
+        str_mode[j+1] = 'w';
+        str_mode[j+2] = '-';
+        break;
+      case 3:
+        str_mode[j] =   '-';
+        str_mode[j+1] = 'w';
+        str_mode[j+2] = 'x';
+        break;
+      case 4:
+        str_mode[j] =   'r';
+        str_mode[j+1] = '-';
+        str_mode[j+2] = '-';
+        break;
+      case 5:
+        str_mode[j] =   'r';
+        str_mode[j+1] = '-';
+        str_mode[j+2] = 'x';
+        break;
+      case 6:
+        str_mode[j] =   'r';
+        str_mode[j+1] = 'w';
+        str_mode[j+2] = '-';
+        break;
+      case 7:
+        str_mode[j] =   'r';
+        str_mode[j+1] = 'w';
+        str_mode[j+2] = 'x';
+        break;
+      default: break;
+    }
+  }
+  return str_mode;
+
+}
 
