@@ -14,16 +14,17 @@
 #include <sys/sysmacros.h>
 
 #ifndef FASLE
-# define FALSE 0
+# define FALSE      0
 #endif // FALSE
 
 #ifndef TRUE 
 # define TRUE 1
 #endif // TRUE
 
-#define BUF_SIZE 50000
-#define O_BUF 8
-#define DNE "DOES_NOT_EXIST"
+#define BUF_SIZE    50000
+#define O_BUF       8
+#define DNE         "DOES_NOT_EXIST"
+#define PERM_MASK        000777
 
 #ifdef NOISY_DEBUG
 # define NOISY_DEBUG_PRINT fprintf(stderr, "%s %s %d\n", __FILE__, __func__, __LINE__)
@@ -113,10 +114,12 @@ main(int argc, char **argv)
 
     int *oct_mode;
     char *str_mode;
+    uint octal = sb.st_mode & PERM_MASK;
     oct_mode = conv_octal(sb.st_mode);
     str_mode = conv_omode(oct_mode, ld_mode);
-    printf("  Mode:                     %s        (%d%d%d in octal)\n",
-        str_mode, oct_mode[5], oct_mode[6], oct_mode[7]);
+    //printf("  Mode:                     %s        (%d%d%d in octal)\n",
+     //   str_mode, oct_mode[5], oct_mode[6], oct_mode[7]);
+    printf("  Mode:                     %s        (%o in octal)\n", str_mode, octal);
 
     printf("  Link count:               %ju\n", (uintmax_t) sb.st_nlink);
 
