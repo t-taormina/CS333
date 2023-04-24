@@ -14,17 +14,17 @@
 #include <sys/sysmacros.h>
 
 #ifndef FASLE
-# define FALSE      0
+# define FALSE       0
 #endif // FALSE
 
 #ifndef TRUE 
-# define TRUE 1
+# define TRUE        1
 #endif // TRUE
 
-#define BUF_SIZE    50000
-#define O_BUF       8
-#define DNE         "DOES_NOT_EXIST"
-#define PERM_MASK        000777
+#define BUF_SIZE     50000
+#define O_BUF        8
+#define DNE          "DOES_NOT_EXIST"
+#define P_MASK       000777
 
 #ifdef NOISY_DEBUG
 # define NOISY_DEBUG_PRINT fprintf(stderr, "%s %s %d\n", __FILE__, __func__, __LINE__)
@@ -32,8 +32,9 @@
 # define NOISY_DEBUG_PRINT
 #endif // NOISY_DEBUG
       
-int *conv_octal(int);
-char *conv_omode(int*, char);
+int     *conv_octal(int);
+char    *conv_omode(int*, char);
+void    conv_wday(int, char*);
 
 int
 main(int argc, char **argv)
@@ -55,6 +56,7 @@ main(int argc, char **argv)
     printf("  File type:                ");
     char ld_mode;
 
+    // Handle file type
     switch (sb.st_mode & S_IFMT) {
       case S_IFBLK:  printf("block device\n");            
                      ld_mode = 'b';
@@ -101,25 +103,27 @@ main(int argc, char **argv)
                      ld_mode = 'l';
                      break;
 
-      default:       printf("unknown\n");                 break;
+      default:       printf("unknown\n");
+                     break;
     }
 
+    // Handle device ID
     printf("  Device ID number:         %jxh/%jdd\n",
       (uintmax_t) minor(sb.st_dev),
       (uintmax_t) minor(sb.st_dev));
-      //minor(sb.st_dev),
-      //major(sb.st_dev));
 
     printf("  I-node number:            %ju\n", (uintmax_t) sb.st_ino);
 
-    int *oct_mode;
-    char *str_mode;
-    uint octal = sb.st_mode & PERM_MASK;
+    // Handle st_mode data
+    int      *oct_mode;
+    char     *str_mode;
+    uintmax_t octal;
+
+    octal = sb.st_mode & P_MASK;
     oct_mode = conv_octal(sb.st_mode);
     str_mode = conv_omode(oct_mode, ld_mode);
-    //printf("  Mode:                     %s        (%d%d%d in octal)\n",
-     //   str_mode, oct_mode[5], oct_mode[6], oct_mode[7]);
-    printf("  Mode:                     %s        (%o in octal)\n", str_mode, octal);
+    printf("  Mode:                     %s        (%03jo in octal)\n",
+        str_mode, octal);
 
     printf("  Link count:               %ju\n", (uintmax_t) sb.st_nlink);
 
@@ -141,13 +145,37 @@ main(int argc, char **argv)
     printf("  Blocks allocated:         %jd\n",
         (intmax_t) sb.st_blocks);
 
-    printf("  Last status change:       %s", ctime(&sb.st_ctime));
-    printf("  Last file access:         %s", ctime(&sb.st_atime));
-    printf("  Last file modification:   %s", ctime(&sb.st_mtime));
+    // Handle time output
+    struct    tm *tm;
+    char      timestr[BUFSIZ];
+
+
+    // Access time
+    if ((tm = localtime(&sb.st_atime)) == NULL)
+      exit(EXIT_FAILURE);
+    if (strftime(timestr, sizeof(timestr), "%Y-%m-%d %H:%M:%S %z (%Z) %a (local)",
+          tm) == 0)
+      exit(EXIT_FAILURE);
+    printf("  Last file access:         %s\n", timestr);
+  
+    // Modification time
+    if ((tm = localtime(&sb.st_mtime)) == NULL)
+      exit(EXIT_FAILURE);
+    if (strftime(timestr, sizeof(timestr), "%Y-%m-%d %H:%M:%S %z (%Z) %a (local)",
+          tm) == 0)
+      exit(EXIT_FAILURE);
+    printf("  Last file modification:   %s\n", timestr);
+
+    // Status time
+    if ((tm = localtime(&sb.st_ctime)) == NULL)
+      exit(EXIT_FAILURE);
+    if (strftime(timestr, sizeof(timestr), "%Y-%m-%d %H:%M:%S %z (%Z) %a (local)",
+          tm) == 0)
+      exit(EXIT_FAILURE);
+    printf("  Last status change:       %s\n", timestr);
   }
   exit(EXIT_SUCCESS);
 }
-
 
 int 
 *conv_octal(int number)
@@ -216,6 +244,4 @@ char
     }
   }
   return str_mode;
-
 }
-
