@@ -13,24 +13,23 @@
 #include <sys/stat.h>
 #include <sys/sysmacros.h>
 
-#ifndef FASLE
+#ifndef  FASLE
 # define FALSE       0
-#endif // FALSE
+#endif// FALSE
 
-#ifndef TRUE 
+#ifndef  TRUE 
 # define TRUE        1
-#endif // TRUE
+#endif //TRUE
 
-#define BUF_SIZE     50000
 #define O_BUF        8
 #define DNE          "DOES_NOT_EXIST"
 #define P_MASK       000777
 
-#ifdef NOISY_DEBUG
+#ifdef   NOISY_DEBUG
 # define NOISY_DEBUG_PRINT fprintf(stderr, "%s %s %d\n", __FILE__, __func__, __LINE__)
 #else // NOISY_DEBUG
 # define NOISY_DEBUG_PRINT
-#endif // NOISY_DEBUG
+#endif// NOISY_DEBUG
       
 int     *conv_octal(int);
 char    *conv_omode(int*, char);
@@ -51,10 +50,9 @@ main(int argc, char **argv)
       exit(EXIT_FAILURE);
     }
 
-    printf("File: %s\n", argv[i]);
-
-    printf("  File type:                ");
     char ld_mode;
+    printf("File: %s\n", argv[i]);
+    printf("  File type:                ");
 
     // Handle file type
     switch (sb.st_mode & S_IFMT) {
@@ -77,11 +75,11 @@ main(int argc, char **argv)
                      ld_mode = 's';
                      break;
       case S_IFLNK:
-                     char *buf;
+                     char    *buf;
                      ssize_t bufsize, nbytes;
                      bufsize = sb.st_size;
                      if (sb.st_size == 0) {
-                       bufsize = BUF_SIZE;
+                       bufsize = BUFSIZ;
                      }
                      buf = malloc(bufsize);
                      if (buf == NULL) {
@@ -93,6 +91,7 @@ main(int argc, char **argv)
                        perror("readlink");
                        exit(EXIT_FAILURE);
                      }
+                     //if(nbytes == -1) {
                      if (strcmp(buf, DNE) == 0) {
                        printf("Symbolic link - with dangling destination\n");
                      }
@@ -111,7 +110,6 @@ main(int argc, char **argv)
     printf("  Device ID number:         %jxh/%jdd\n",
       (uintmax_t) minor(sb.st_dev),
       (uintmax_t) minor(sb.st_dev));
-
     printf("  I-node number:            %ju\n", (uintmax_t) sb.st_ino);
 
     // Handle st_mode data
@@ -119,19 +117,18 @@ main(int argc, char **argv)
     char     *str_mode;
     uintmax_t octal;
 
-    octal = sb.st_mode & P_MASK;
+    octal    = sb.st_mode & P_MASK;
     oct_mode = conv_octal(sb.st_mode);
     str_mode = conv_omode(oct_mode, ld_mode);
     printf("  Mode:                     %s        (%03jo in octal)\n",
         str_mode, octal);
-
     printf("  Link count:               %ju\n", (uintmax_t) sb.st_nlink);
 
     // Gather group and user info
-    struct group *grp;
-    grp = getgrgid(sb.st_gid);
+    struct group  *grp;
     struct passwd *usr;
-    usr = getpwuid(sb.st_uid);
+    grp    =      getgrgid(sb.st_gid);
+    usr    =      getpwuid(sb.st_uid);
 
     printf("  Owner Id:                 %s           (UID = %d)\n",
           usr->pw_name, usr->pw_uid);
@@ -148,7 +145,6 @@ main(int argc, char **argv)
     // Handle time output
     struct    tm *tm;
     char      timestr[BUFSIZ];
-
 
     // Access time
     if ((tm = localtime(&sb.st_atime)) == NULL)
