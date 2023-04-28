@@ -20,5 +20,5 @@ clean :
 	rm mystat mywc $(MYWC) $(MYSTAT)
 
 open : 
-	vim *.c Makefile -p
+	vim *.c  Makefile -p
 

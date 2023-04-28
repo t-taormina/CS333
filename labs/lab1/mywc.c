@@ -82,6 +82,7 @@ main(int argc, char **argv)
           fprintf(ofile, "        -f file : use file as input, defaults to stdin\n");
           fprintf(ofile, "        -h      : display a command options and exit\n");
           fprintf(ofile, "        -v      : give LOTS of gross verbose trace output to stderr.\n");
+          exit(EXIT_SUCCESS);
           break;
         case 'v':
           is_verbose = !is_verbose;

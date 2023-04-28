@@ -11,7 +11,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/sysmacros.h>
+//#include "sysmacros.h"
 
 #ifndef  FASLE
 # define FALSE       0
@@ -50,7 +50,9 @@ main(int argc, char **argv)
       exit(EXIT_FAILURE);
     }
 
-    char ld_mode;
+    char ld_mode = '\0';
+    char *buf = NULL;
+    ssize_t bufsize, nbytes;
     printf("File: %s\n", argv[i]);
     printf("  File type:                ");
 
@@ -75,8 +77,6 @@ main(int argc, char **argv)
                      ld_mode = 's';
                      break;
       case S_IFLNK:
-                     char    *buf;
-                     ssize_t bufsize, nbytes;
                      bufsize = sb.st_size;
                      if (sb.st_size == 0) {
                        bufsize = BUFSIZ;
@@ -102,7 +102,8 @@ main(int argc, char **argv)
                      ld_mode = 'l';
                      break;
 
-      default:       printf("unknown\n");
+      default:       
+                     printf("unknown\n");
                      break;
     }
 
