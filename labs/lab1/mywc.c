@@ -44,7 +44,7 @@ main(int argc, char **argv)
 {
   FILE *ifile = stdin;
   FILE *ofile = stdout;
-  count_t ct;
+  count_t ct = {0, 0, 0};
   char file[BUFSIZ];
   {
     int opt = 0;
@@ -82,7 +82,6 @@ main(int argc, char **argv)
           fprintf(ofile, "        -f file : use file as input, defaults to stdin\n");
           fprintf(ofile, "        -h      : display a command options and exit\n");
           fprintf(ofile, "        -v      : give LOTS of gross verbose trace output to stderr.\n");
-          exit(EXIT_SUCCESS);
           break;
         case 'v':
           is_verbose = !is_verbose;
@@ -158,5 +157,6 @@ output_data(FILE *ofile, count_t  *ct, int fpass, int *flags, char *file)
     if (flags[2] == TRUE) { fprintf(ofile, "%d ", ct->c); }
     if (flags[3] == TRUE) { fprintf(ofile, "%s ", file);  }
   }
+  fprintf(ofile, "\n");
   return 0;
 }

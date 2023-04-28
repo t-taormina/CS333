@@ -11,7 +11,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-//#include "sysmacros.h"
+#include <sys/sysmacros.h>
 
 #ifndef  FASLE
 # define FALSE       0
