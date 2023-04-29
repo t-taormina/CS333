@@ -42,10 +42,14 @@ int output_data(FILE *, count_t  *, int, int *, char *);
 int 
 main(int argc, char **argv) 
 {
+  if (argc < 2) {
+    fprintf(stderr, "Usage: %s -<flag option> <path to file>\n", argv[0]);
+    exit(EXIT_FAILURE);
+  }
   FILE *ifile = stdin;
   FILE *ofile = stdout;
-  count_t ct = {0, 0, 0};
-  char file[BUFSIZ];
+  count_t ct = {0, 0, 0}; /*structure to store count of lines, words, and characters*/
+  char file[BUFSIZ]; /*Stores the name of the file that data is read from.*/
   {
     int opt = 0;
     NOISY_DEBUG_PRINT;
@@ -105,7 +109,6 @@ main(int argc, char **argv)
   if (is_verbose) {
     fprintf(stderr, "output data complete\n");
   }
- 
   if (ifile != stdin) {
     fclose(ifile);
   }
@@ -157,6 +160,5 @@ output_data(FILE *ofile, count_t  *ct, int fpass, int *flags, char *file)
     if (flags[2] == TRUE) { fprintf(ofile, "%d ", ct->c); }
     if (flags[3] == TRUE) { fprintf(ofile, "%s ", file);  }
   }
-  fprintf(ofile, "\n");
   return 0;
 }
