@@ -1,3 +1,5 @@
+# Tyler Taormina - taormina@pdx.edu
+
 CC = gcc
 DEBUG = -g
 DEFINES = 
@@ -36,9 +38,6 @@ $(PROG4): $(PROG4).o
 
 $(PROG4).o: $(PROG4).c $(INCLUDES)
 	$(CC) $(CFLAGS) -c $<
-
-
-
 
 clean cls: 
 	rm -f $(PROGS) *.o *~ \#*

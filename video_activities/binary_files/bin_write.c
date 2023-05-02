@@ -1,3 +1,5 @@
+// Tyler Taormina - taormina@pdx.edu
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -41,5 +43,3 @@ main(void)
   umask(old_mode);
   return EXIT_SUCCESS;
 }
-
-

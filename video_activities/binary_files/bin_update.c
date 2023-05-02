@@ -1,3 +1,5 @@
+// Tyler Taormina - taormina@pdx.edu
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -64,4 +66,3 @@ main(int argc, char **argv)
 
   return EXIT_SUCCESS;
 }
-

@@ -1,3 +1,5 @@
+// Tyler Taormina - taormina@pdx.edu
+
 #pragma once
 
 #ifndef _BINFILE_H
