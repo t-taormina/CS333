@@ -1,5 +1,7 @@
 mystat 
 *.o
+*.tar
+*.tar.gz
 rchaney_OP
 test_command.txt
 class_activities/Activity4-cs333.pdf
