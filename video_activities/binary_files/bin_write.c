@@ -25,6 +25,7 @@ main(void)
   ofd = open(FILE_NAME
              , O_WRONLY | O_TRUNC | O_CREAT
              , S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+  // ALTERNATE TECHNIQUE FOR FILE PERMISSIONS
   // chmod(FILE_NAME, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 
   if (ofd < 0 ) {
