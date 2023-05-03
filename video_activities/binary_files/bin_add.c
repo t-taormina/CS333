@@ -11,6 +11,7 @@
 #include "bin_file.h"
 
 #define OPTIONS "g:G:F:"
+
 int 
 main(int argc, char **argv)
 {
@@ -20,6 +21,7 @@ main(int argc, char **argv)
   double gpa = -1.0;
   bin_file_t student;
   off_t size = sizeof(bin_file_t);
+
   {
     int opt = 0;
     while((opt = getopt(argc, argv, OPTIONS)) != -1) {
@@ -48,12 +50,13 @@ main(int argc, char **argv)
     fprintf(stderr, "must specify gpa(double), given name(string), and family name(string)");
     exit(EXIT_FAILURE);
   }
-  ofd = open(FILE_NAME, O_RDWR | O_APPEND); // OPENED
 
+  ofd = open(FILE_NAME, O_RDWR | O_APPEND); // OPENED
   if(ofd < 0) {
     perror("cannot open " FILE_NAME " for output");
     exit(EXIT_FAILURE);
   }
+
   lseek(ofd, -size, SEEK_END);
   read(ofd, &student, sizeof(bin_file_t));
   student.id += 1;

@@ -46,4 +46,4 @@ tar:
 	tar cvfa bin_files_taormina.tar.gz *.[ch] [mM]akefile
 
 open: 
-	vim *.c *.h Makefile -p
+	nvim *.c *.h Makefile -p
