@@ -1,4 +1,7 @@
-// gcc -Wall -o zhead zhead.c
+// Tyler Taormina - taormina@ada.cs.pdx.edu
+// CS 333 - zhead video activity
+
+// COMPILE WITH --> gcc -Wall -o zhead zhead.c
 
 #include <sys/types.h>
 #include <unistd.h>
@@ -37,7 +40,6 @@ main(int argc, char **argv)
         fprintf(stderr, "Missing file name\n");
         exit(EXIT_FAILURE);
     }
-
     {
         int pipes[2] = {-1, -1};
         pid_t pid = -1;
