@@ -22,7 +22,7 @@ main(int argc, char **argv)
                 case 'n':
                     lines = optarg;
                     break;
-                case 'h'
+                case 'h':
                     printf("vim is the best!!!\n");
                     break;
                 default:
@@ -83,19 +83,22 @@ main(int argc, char **argv)
                 break;
             default:
                 {
-                    char **lhp_argv = {
+                    char *lhp_argv[] = {
                         "zcat"
                         , file_name
-                        , (char *) NULL;
+                        , (char *) NULL
                     };
 
-                    if (dup2(pipe[STDOUT_FILENO], STDOUT_FILENO) < 0) {
+                    if (dup2(pipes[STDOUT_FILENO], STDOUT_FILENO) < 0) {
                         perror("parent process failed dup2");
                         exit(EXIT_FAILURE);
                     }
                     close(pipes[STDIN_FILENO]);
                     close(pipes[STDOUT_FILENO]);
                     execvp(lhp_argv[0], lhp_argv);
+                    perror("parent execvp failed");
+                    fprintf(stderr, "*** %d: zcat parent failed ***\n", getpid());
+                    exit(EXIT_FAILURE);
                 }
                 break;
         }
