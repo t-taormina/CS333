@@ -7,17 +7,21 @@ CFLAGS = $(DEBUG) -Wall -Wshadow -Wunreachable-code -Wredundant-decls \
 				 -Wmissing-declarations -Wold-style-definition -Wmissing-prototypes \
 				 -Wdeclaration-after-statement -Wextra $(DEFINES)
 PROG1 = psush
-PARSE = cmd_parse.c
+PROG2 = cmd_parse
+
 PROGS = $(PROG1)  
 INCLUDES = cmd_parse.h
 
 
 all: $(PROGS)
 
-$(PROG1): $(PROG1).o
-	$(CC) $(CFLAGS) $(PARSE) -o $@ $^
+$(PROG1): $(PROG1).o $(PROG2).o 
+	$(CC) $(CFLAGS) -o $@ $^
 
 $(PROG1).o: $(PROG1).c $(INCLUDES)
+	$(CC) $(CFLAGS) -c $<
+
+$(PROG2).o: $(PROG2).c $(INCLUDES)
 	$(CC) $(CFLAGS) -c $<
 
 clean cls: 
@@ -25,5 +29,6 @@ clean cls:
 
 tar: 
 	tar cvfa bin_files_taormina.tar.gz *.[ch] [mM]akefile
+
 open: 
 	nvim *.c *.h Makefile -p

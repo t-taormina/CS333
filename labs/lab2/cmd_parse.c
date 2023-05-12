@@ -21,6 +21,7 @@ process_user_input_simple(void)
 {
     char str[MAX_STR_LEN] = {'\0'};
     char cwd[50] = {'\0'};
+    char host_name[25] = {'\0'};
     char *ret_val = NULL;
     char *raw_cmd = NULL;
     cmd_list_t *cmd_list = NULL;
@@ -35,11 +36,14 @@ process_user_input_simple(void)
         if (getcwd(cwd, sizeof(cwd)) == NULL) {
             perror("getcwd() error");
         }
-        sprintf(prompt, " %s %s \n%s<put @system name here> # "
+        if (gethostname(host_name, sizeof(host_name)) == -1) {
+            perror("gethostname() error");
+        }
+        sprintf(prompt, " %s %s \n%s@%s # "
                 , PROMPT_STR
                 , cwd
-                //, current working directory
                 , getenv("LOGNAME")
+                , host_name
                 //, fully qualified hostname
             );
         fputs(prompt, stdout);
@@ -249,7 +253,12 @@ free_cmd (cmd_t *cmd)
         while (cmd->param_list != NULL) {
             temp = cmd->param_list;
             cmd->param_list = cmd->param_list->next;
+            if (temp->param != NULL) {
+                free(temp->param);
+                temp->param = NULL;
+            }
             free(temp);
+            temp = NULL;
         }
         //if (cmd->input_file_name != NULL)
             //free(cmd->input_file_name);

@@ -1,4 +1,5 @@
 // rchaney@pdx.edu
+#pragma once
 
 #ifndef _CMD_PARSE_H
 # define _CMD_PARSE_H
