@@ -6,6 +6,7 @@ mystat
 .DS_Store
 rchaney_OP
 test_command.txt
+valgrind-out.txt
 class_activities/Activity4-cs333.pdf
 class_activities/taormina-week3-videoactivities.pdf
 
