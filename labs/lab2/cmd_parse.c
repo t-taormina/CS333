@@ -61,7 +61,6 @@ process_user_input_simple(void)
         if (strcmp(str, BYE_CMD) == 0) {
             // Pickup your toys and go home. I just hope there are not
             // any memory leaks. ;-)
-            free_list(cmd_list);
             break;
         }
 
@@ -215,7 +214,8 @@ free_list(cmd_list_t *cmd_list)
         cmd_list->head = cmd_list->head->next;
         free_cmd(temp); 
     }
-    cmd_list->head = cmd_list->tail = NULL;
+    free(cmd_list);
+    cmd_list = NULL;
 }
 
 void
@@ -232,17 +232,23 @@ print_list(cmd_list_t *cmd_list)
 void
 free_cmd (cmd_t *cmd)
 {
+    param_t *temp;
+
     if (cmd != NULL) {
         if (cmd->raw_cmd != NULL)
             free(cmd->raw_cmd);
         if (cmd->cmd != NULL)
             free(cmd->cmd);
-        if (cmd->param_list!= NULL)
-            free(cmd->param_list);
-        if (cmd->input_file_name != NULL)
-            free(cmd->input_file_name);
-        if (cmd->output_file_name != NULL)
-            free(cmd->output_file_name);
+        while (cmd->param_list != NULL) {
+            temp = cmd->param_list;
+            cmd->param_list = cmd->param_list->next;
+            free(temp);
+        }
+        //if (cmd->input_file_name != NULL)
+            //free(cmd->input_file_name);
+        //if (cmd->output_file_name != NULL)
+            //free(cmd->output_file_name);
+        free(cmd);
         cmd = NULL;
     }
 }
