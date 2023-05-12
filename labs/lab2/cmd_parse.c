@@ -20,6 +20,7 @@ int
 process_user_input_simple(void)
 {
     char str[MAX_STR_LEN] = {'\0'};
+    char cwd[50] = {'\0'};
     char *ret_val = NULL;
     char *raw_cmd = NULL;
     cmd_list_t *cmd_list = NULL;
@@ -29,8 +30,14 @@ process_user_input_simple(void)
     for ( ; ; ) {
         // Set up a cool user prompt.
         // test to see of stdout is a terminal device (a tty)
-        sprintf(prompt, " %s <put directory here> \n%s<put @system name here> # "
+        if (!isatty(fileno(stdout)))
+                break;
+        if (getcwd(cwd, sizeof(cwd)) == NULL) {
+            perror("getcwd() error");
+        }
+        sprintf(prompt, " %s %s \n%s<put @system name here> # "
                 , PROMPT_STR
+                , cwd
                 //, current working directory
                 , getenv("LOGNAME")
                 //, fully qualified hostname
