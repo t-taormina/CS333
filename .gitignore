@@ -5,6 +5,7 @@ mystat
 *.bin
 .DS_Store
 rchaney_OP
+psush
 test_command.txt
 valgrind-out.txt
 class_activities/Activity4-cs333.pdf
