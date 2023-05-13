@@ -163,8 +163,13 @@ simple_argv(int argc, char *argv[] )
     void 
 exec_commands( cmd_list_t *cmds ) 
 {
-    cmd_t *cmd = cmds->head;
+    cmd_t *cmd = NULL; 
+    param_t *param = NULL;
 
+    if (NULL == cmds)
+        return;
+
+    cmd = cmds->head;
     if (1 == cmds->count) {
         if (!cmd->cmd) {
             // if it is an empty command, bail.
@@ -203,10 +208,16 @@ exec_commands( cmd_list_t *cmds )
 
         /* Echo command */
         else if (0 == strcmp(cmd->cmd, ECHO_CMD)) {
-            if(strlen(cmd->cmd) == strlen(cmd->raw_cmd))
-                printf("\n");
-            else
-                printf("%s\n", ((cmd->raw_cmd) + 5));
+            if(cmd->param_count == 0)
+                fprintf(stdout, "\n");
+            else {
+                param = cmd->param_list;
+                while (NULL != param) {
+                    fprintf(stdout, "%s ", param->param);
+                    param = param->next;
+                }
+                fprintf(stdout, "\n");
+            }
         }
 
         else if (0 == strcmp(cmd->cmd, HISTORY_CMD)) {
