@@ -190,6 +190,8 @@ exec_commands( cmd_list_t *cmds )
                 }
             }
         }
+
+        /* Current working directory */
         else if (0 == strcmp(cmd->cmd, CWD_CMD)) {
             char str[MAXPATHLEN];
 
@@ -198,12 +200,15 @@ exec_commands( cmd_list_t *cmds )
             getcwd(str, MAXPATHLEN); 
             printf(" " CWD_CMD ": %s\n", str);
         }
+
+        /* Echo command */
         else if (0 == strcmp(cmd->cmd, ECHO_CMD)) {
             if(strlen(cmd->cmd) == strlen(cmd->raw_cmd))
                 printf("\n");
             else
                 printf("%s\n", ((cmd->raw_cmd) + 5));
         }
+
         else if (0 == strcmp(cmd->cmd, HISTORY_CMD)) {
             // display the history here
         }
