@@ -20,8 +20,8 @@ int
 process_user_input_simple(void)
 {
     char str[MAX_STR_LEN] = {'\0'};
-    char cwd[50] = {'\0'};
-    char host_name[25] = {'\0'};
+    char cwd[60] = {'\0'};
+    char host_name[20] = {'\0'};
     char *ret_val = NULL;
     char *raw_cmd = NULL;
     cmd_list_t *cmd_list = NULL;
@@ -33,18 +33,21 @@ process_user_input_simple(void)
         // test to see of stdout is a terminal device (a tty)
         if (!isatty(fileno(stdout)))
                 break;
+        /* Get info for command prompt - path to current directory */
         if (getcwd(cwd, sizeof(cwd)) == NULL) {
             perror("getcwd() error");
+            exit(EXIT_FAILURE);
         }
+        /* Get info for command prompt - username */
         if (gethostname(host_name, sizeof(host_name)) == -1) {
             perror("gethostname() error");
+            exit(EXIT_FAILURE);
         }
         sprintf(prompt, " %s %s \n%s@%s # "
                 , PROMPT_STR
                 , cwd
                 , getenv("LOGNAME")
                 , host_name
-                //, fully qualified hostname
             );
         fputs(prompt, stdout);
         memset(str, 0, MAX_STR_LEN);
@@ -123,41 +126,41 @@ process_user_input_simple(void)
     return(EXIT_SUCCESS);
 }
 
-void 
+    void 
 simple_argv(int argc, char *argv[] )
 {
     int opt;
 
     while ((opt = getopt(argc, argv, "hv")) != -1) {
         switch (opt) {
-        case 'h':
-            // help
-            // Show something helpful
-            fprintf(stdout, "You must be out of your Vulcan mind if you think\n"
-                    "I'm going to put helpful things in here.\n\n");
-            exit(EXIT_SUCCESS);
-            break;
-        case 'v':
-            // verbose option to anything
-            // I have this such that I can have -v on the command line multiple
-            // time to increase the verbosity of the output.
-            is_verbose++;
-            if (is_verbose) {
-                fprintf(stderr, "verbose: verbose option selected: %d\n"
-                        , is_verbose);
-            }
-            break;
-        case '?':
-            fprintf(stderr, "*** Unknown option used, ignoring. ***\n");
-            break;
-        default:
-            fprintf(stderr, "*** Oops, something strange happened <%c> ... ignoring ...***\n", opt);
-            break;
+            case 'h':
+                // help
+                // Show something helpful
+                fprintf(stdout, "You must be out of your Vulcan mind if you think\n"
+                        "I'm going to put helpful things in here.\n\n");
+                exit(EXIT_SUCCESS);
+                break;
+            case 'v':
+                // verbose option to anything
+                // I have this such that I can have -v on the command line multiple
+                // time to increase the verbosity of the output.
+                is_verbose++;
+                if (is_verbose) {
+                    fprintf(stderr, "verbose: verbose option selected: %d\n"
+                            , is_verbose);
+                }
+                break;
+            case '?':
+                fprintf(stderr, "*** Unknown option used, ignoring. ***\n");
+                break;
+            default:
+                fprintf(stderr, "*** Oops, something strange happened <%c> ... ignoring ...***\n", opt);
+               break;
         }
     }
 }
 
-void 
+    void 
 exec_commands( cmd_list_t *cmds ) 
 {
     cmd_t *cmd = cmds->head;
@@ -196,9 +199,10 @@ exec_commands( cmd_list_t *cmds )
             printf(" " CWD_CMD ": %s\n", str);
         }
         else if (0 == strcmp(cmd->cmd, ECHO_CMD)) {
-            // insert code here
-            // insert code here
-            // Is that an echo?
+            if(strlen(cmd->cmd) == strlen(cmd->raw_cmd))
+                printf("\n");
+            else
+                printf("%s\n", ((cmd->raw_cmd) + 5));
         }
         else if (0 == strcmp(cmd->cmd, HISTORY_CMD)) {
             // display the history here
