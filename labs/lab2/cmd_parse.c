@@ -1,4 +1,7 @@
-// rchaney@pdx.edu
+/* Tyler Taormina - taormina@pdx.edu */
+/* CS333 PSUsh program - Lab 2*/
+/* Credits: rchaney@pdx.edu*/
+
 
 #include <stdio.h>
 #include <string.h>
@@ -9,6 +12,7 @@
 #include "cmd_parse.h"
 
 #define PROMPT_LEN 100
+#define MAX_HISTORY 15
 
 // I have this a global so that I don't have to pass it to every
 // function where I might want to use it. Yes, I know global variables
@@ -25,10 +29,15 @@ process_user_input_simple(void)
     char *ret_val = NULL;
     char *raw_cmd = NULL;
     cmd_list_t *cmd_list = NULL;
+    hist_list_t *hist_list = NULL;
+    
     int cmd_count = 0;
     char prompt[PROMPT_LEN] = {'\0'};
+    hist_list = (hist_list_t *) calloc(1, sizeof(hist_list_t));
+    hist_list->count = 0;
 
     for ( ; ; ) {
+        hist_t *hist = NULL;
         // Set up a cool user prompt.
         // test to see of stdout is a terminal device (a tty)
         if (!isatty(fileno(stdout)))
@@ -73,12 +82,15 @@ process_user_input_simple(void)
         }
 
         if (strcmp(str, BYE_CMD) == 0) {
-            // Pickup your toys and go home. I just hope there are not
-            // any memory leaks. ;-)
             break;
         }
 
         // I put the update of the history of command in here.
+        if (strcmp(str, HISTORY_CMD) != 0) {
+            hist = (hist_t *) calloc(1, sizeof(hist_t));
+            hist->hist = strdup(str);
+            insert_hist(hist_list, hist);
+        }
 
         // Basic commands are pipe delimited.
         // This is really for Stage 2.
@@ -114,7 +126,7 @@ process_user_input_simple(void)
 
         // This is a really good place to call a function to exec the
         // the commands just parsed from the user's command line.
-        exec_commands(cmd_list);
+        exec_commands(cmd_list, hist_list);
 
         // We (that includes you) need to free up all the stuff we just
         // allocated from the heap. That linked list of linked lists looks
@@ -122,12 +134,13 @@ process_user_input_simple(void)
         free_list(cmd_list);
         cmd_list = NULL;
     }
+    free_hist_list(hist_list);
 
     return(EXIT_SUCCESS);
 }
 
-    void 
-simple_argv(int argc, char *argv[] )
+void 
+simple_argv(int argc, char *argv[])
 {
     int opt;
 
@@ -160,11 +173,12 @@ simple_argv(int argc, char *argv[] )
     }
 }
 
-    void 
-exec_commands( cmd_list_t *cmds ) 
+void 
+exec_commands(cmd_list_t *cmds, hist_list_t *hist_list) 
 {
     cmd_t *cmd = NULL; 
     param_t *param = NULL;
+    char *home = NULL;
 
     if (NULL == cmds)
         return;
@@ -172,26 +186,34 @@ exec_commands( cmd_list_t *cmds )
     cmd = cmds->head;
     if (1 == cmds->count) {
         if (!cmd->cmd) {
-            // if it is an empty command, bail.
             return;
         }
         if (0 == strcmp(cmd->cmd, CD_CMD)) {
             if (0 == cmd->param_count) {
-                // Just a "cd" on the command line without a target directory
-                // need to cd to the HOME directory.
-
-                // Is there an environment variable, somewhere, that contains
-                // the HOME directory that could be used as an argument to
-                // the chdir() fucntion?
+                if (NULL == (home = getenv("HOME")))
+                    perror("getenv() error");
+                if (-1 == chdir(home)){
+                    perror("psuSH: cd: home: ");
+                }
+                fprintf(stdout, "\n");
+                /*if ((home = getenv("HOME")) == NULL) {
+                    home = getpwuid(getuid())->pw->dir;
+                }*/ 
+                // Maybe use this if I run into issues with the getenv()
             }
             else {
                 // try and cd to the target directory. It would be good to check
                 // for errors here.
                 if (0 == chdir(cmd->param_list->param)) {
-                    // a happy chdir!  ;-)
+                    char str[MAXPATHLEN];
+                    getcwd(str, MAXPATHLEN); 
+                    fprintf(stdout, "%s\n", str);
+                    fprintf(stdout, "\n");
                 }
                 else {
-                    // a sad chdir.  :-(
+                    fprintf(stderr, "psuSH: cd: %s: ", cmd->param_list->param);
+                    perror("");
+                    fprintf(stdout, "\n");
                 }
             }
         }
@@ -200,8 +222,6 @@ exec_commands( cmd_list_t *cmds )
         else if (0 == strcmp(cmd->cmd, CWD_CMD)) {
             char str[MAXPATHLEN];
 
-            // Fetch the Current Working Wirectory (CWD).
-            // aka - get country western dancing
             getcwd(str, MAXPATHLEN); 
             printf(" " CWD_CMD ": %s\n", str);
         }
@@ -217,11 +237,13 @@ exec_commands( cmd_list_t *cmds )
                     param = param->next;
                 }
                 fprintf(stdout, "\n");
+                fprintf(stdout, "\n");
             }
         }
 
+        /* History command */
         else if (0 == strcmp(cmd->cmd, HISTORY_CMD)) {
-            // display the history here
+            print_hist_list(hist_list);
         }
         else {
             // A single command to create and exec
@@ -250,6 +272,38 @@ free_list(cmd_list_t *cmd_list)
 }
 
 void
+free_hist_list(hist_list_t *hist_list)
+{
+    hist_t *temp;
+    while (hist_list->head != NULL) {
+        temp = hist_list->head;
+        hist_list->head = hist_list->head->next;
+        free_hist(temp);
+    }
+    free(hist_list);
+    hist_list = NULL;
+}
+
+void
+insert_hist(hist_list_t *hist_list, hist_t *hist)
+{
+    if (hist_list->head == NULL) {
+        hist_list->head = hist_list->tail = hist;
+    }
+    else {
+        hist_list->tail->next = hist;
+        hist_list->tail = hist;
+        if (hist_list->count == MAX_HISTORY - 1) {
+            hist_t *temp = hist_list->head;
+            hist_list->head = hist_list->head->next;
+            free_hist(temp);
+        }
+        else 
+            hist_list->count++;
+    }
+}
+
+void
 print_list(cmd_list_t *cmd_list)
 {
     cmd_t *cmd = cmd_list->head;
@@ -266,10 +320,14 @@ free_cmd (cmd_t *cmd)
     param_t *temp;
 
     if (cmd != NULL) {
-        if (cmd->raw_cmd != NULL)
+        if (cmd->raw_cmd != NULL) {
             free(cmd->raw_cmd);
-        if (cmd->cmd != NULL)
+            cmd->raw_cmd = NULL;
+        }
+        if (cmd->cmd != NULL) {
             free(cmd->cmd);
+            cmd->cmd = NULL;
+        }
         while (cmd->param_list != NULL) {
             temp = cmd->param_list;
             cmd->param_list = cmd->param_list->next;
@@ -286,6 +344,19 @@ free_cmd (cmd_t *cmd)
             //free(cmd->output_file_name);
         free(cmd);
         cmd = NULL;
+    }
+}
+
+void 
+free_hist (hist_t *hist)
+{
+    if (NULL != hist) {
+        if (hist->hist != NULL) {
+            free(hist->hist);
+            hist->hist = NULL;
+        }
+        free(hist);
+        hist = NULL;
     }
 }
 
@@ -320,6 +391,19 @@ print_cmd(cmd_t *cmd)
             , (NULL == cmd->output_file_name ? "<na>" : cmd->output_file_name));
     fprintf(stderr,"\tlocation in list of commands: %d\n", cmd->list_location);
     fprintf(stderr,"\n");
+}
+
+void
+print_hist_list(hist_list_t *hist_list)
+{
+    hist_t *temp = NULL;
+    int count = 1;
+    temp = hist_list->head;
+    while(NULL != temp || count < hist_list->count - 1) {
+        fprintf(stdout, "%d %s\n", count, temp->hist);
+        temp = temp->next;
+        count++;
+    }
 }
 
 // Remember how I told you that use of alloca() is

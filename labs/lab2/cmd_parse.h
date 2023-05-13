@@ -1,4 +1,8 @@
-// rchaney@pdx.edu
+/* Tyler Taormina - taormina@pdx.edu */
+/* CS333 PSUsh program - Lab 2*/
+/* Credits: rchaney@pdx.edu*/
+
+
 #pragma once
 
 #ifndef _CMD_PARSE_H
@@ -31,9 +35,20 @@ typedef enum {
 
 // A list of param_t elements.
 typedef struct param_s {
-    char *param;
+    char           *param;
     struct param_s *next;
 } param_t;
+
+typedef struct hist_s {
+    char          *hist;
+    struct hist_s *next;
+} hist_t;
+
+typedef struct hist_list_s {
+    hist_t *head;
+    hist_t *tail;
+    int    count;
+} hist_list_t;
 
 // A linked list that has a linked list as a member.
 typedef struct cmd_s {
@@ -52,7 +67,7 @@ typedef struct cmd_s {
 typedef struct cmd_list_s {
     cmd_t *head;
     cmd_t *tail;
-    int count;
+    int   count;
 } cmd_list_t;
 
 void parse_commands(cmd_list_t *cmd_list);
@@ -60,8 +75,12 @@ void free_list(struct cmd_list_s *);
 void print_list(struct cmd_list_s *);
 void free_cmd(struct cmd_s *);
 void print_cmd(struct cmd_s *);
-void exec_commands(cmd_list_t *cmds);
-int process_user_input_simple(void);
+void insert_hist(struct hist_list_s *, struct hist_s *);
+void free_hist_list(struct hist_list_s *);
+void free_hist(struct hist_s *);
+void print_hist_list(struct hist_list_s *);
+void exec_commands(cmd_list_t *cmds, hist_list_t *hist_list);
+int  process_user_input_simple(void);
 void simple_argv(int argc, char *argv[]);
 
 #endif // _CMD_PARSE_H

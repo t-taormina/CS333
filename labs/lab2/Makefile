@@ -27,7 +27,7 @@ $(PROG2).o: $(PROG2).c $(INCLUDES)
 clean cls: 
 	rm -f $(PROGS) *.o *~ \#*
 
-memcheck:
+test:
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out.txt ./psush
 
 tar: 
