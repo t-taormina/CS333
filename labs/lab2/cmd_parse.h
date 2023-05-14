@@ -27,7 +27,7 @@
 // This enumeration is used when determining if the re direction
 // characters (the < and >) were used on a command.
 typedef enum {
-    REDIRECT_NONE
+      REDIRECT_NONE
     , REDIRECT_FILE
     , REDIRECT_PIPE
     , BACKGROUND_PROC
