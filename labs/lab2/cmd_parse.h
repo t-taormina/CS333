@@ -41,6 +41,8 @@ typedef struct param_s {
 
 typedef struct hist_s {
     char          *hist;
+    char          *time_str;
+    time_t        time;
     struct hist_s *next;
 } hist_t;
 
@@ -79,6 +81,7 @@ void insert_hist(struct hist_list_s *, struct hist_s *);
 void free_hist_list(struct hist_list_s *);
 void free_hist(struct hist_s *);
 void print_hist_list(struct hist_list_s *);
+void build_hist(struct hist_s *, char *);
 void exec_commands(cmd_list_t *cmds, hist_list_t *hist_list);
 int  process_user_input_simple(void);
 void simple_argv(int argc, char *argv[]);

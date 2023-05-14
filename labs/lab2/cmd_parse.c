@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/param.h>
+#include <time.h>
 
 #include "cmd_parse.h"
 
@@ -87,8 +88,9 @@ process_user_input_simple(void)
 
         // I put the update of the history of command in here.
         if (strcmp(str, HISTORY_CMD) != 0) {
+            // Handle time of command
             hist = (hist_t *) calloc(1, sizeof(hist_t));
-            hist->hist = strdup(str);
+            build_hist(hist, str);
             insert_hist(hist_list, hist);
         }
 
@@ -120,19 +122,12 @@ process_user_input_simple(void)
             // Get the next raw command.
             raw_cmd = strtok(NULL, PIPE_DELIM);
         }
-        // Now that I have a linked list of the pipe delimited commands,
-        // go through each individual command.
+
         parse_commands(cmd_list);
 
-        // This is a really good place to call a function to exec the
-        // the commands just parsed from the user's command line.
         exec_commands(cmd_list, hist_list);
 
-        // We (that includes you) need to free up all the stuff we just
-        // allocated from the heap. That linked list of linked lists looks
-        // like it will be nasty to free up, but just follow the memory.
         free_list(cmd_list);
-        cmd_list = NULL;
     }
     free_hist_list(hist_list);
 
@@ -284,6 +279,26 @@ free_hist_list(hist_list_t *hist_list)
     hist_list = NULL;
 }
 
+void 
+build_hist(hist_t *hist, char *str)
+{
+    time_t    t;
+    struct    tm *tm;
+    char      timestr[20];
+
+    t = time(NULL);
+    if ((tm = localtime(&t)) == NULL) {
+        perror("localtime error");
+    }
+    if (strftime(timestr, sizeof(timestr), "%Y-%m-%d %H:%M:%S", 
+          tm) == 0) {
+        perror("strftime() error");
+    }
+    
+    hist->hist = strdup(str);
+    hist->time_str = strdup(timestr);
+}
+
 void
 insert_hist(hist_list_t *hist_list, hist_t *hist)
 {
@@ -355,6 +370,10 @@ free_hist (hist_t *hist)
             free(hist->hist);
             hist->hist = NULL;
         }
+        if (hist->time_str != NULL) {
+            free(hist->time_str);
+            hist->time_str = NULL;
+        }
         free(hist);
         hist = NULL;
     }
@@ -400,10 +419,11 @@ print_hist_list(hist_list_t *hist_list)
     int count = 1;
     temp = hist_list->head;
     while(NULL != temp || count < hist_list->count - 1) {
-        fprintf(stdout, "%d %s\n", count, temp->hist);
+        fprintf(stdout, "%d %s %s\n", count, temp->time_str, temp->hist);
         temp = temp->next;
         count++;
     }
+    fprintf(stdout,"\n");
 }
 
 // Remember how I told you that use of alloca() is
