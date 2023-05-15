@@ -44,25 +44,26 @@ process_user_input_simple(void)
         hist_t *hist = NULL;
         // Set up a cool user prompt.
         // test to see of stdout is a terminal device (a tty)
-        if (!isatty(fileno(stdout)))
-                break;
-        /* Get info for command prompt - path to current directory */
-        if (getcwd(cwd, sizeof(cwd)) == NULL) {
-            perror("getcwd() error");
-            exit(EXIT_FAILURE);
+        if (isatty(fileno(stdout)))
+        {
+            /* Get info for command prompt - path to current directory */
+            if (getcwd(cwd, sizeof(cwd)) == NULL) {
+                perror("getcwd() error");
+                exit(EXIT_FAILURE);
+            }
+            /* Get info for command prompt - username */
+            if (gethostname(host_name, sizeof(host_name)) == -1) {
+                perror("gethostname() error");
+                exit(EXIT_FAILURE);
+            }
+            sprintf(prompt, " %s %s \n%s@%s # "
+                    , PROMPT_STR
+                    , cwd
+                    , getenv("LOGNAME")
+                    , host_name
+                   );
+            fputs(prompt, stdout);
         }
-        /* Get info for command prompt - username */
-        if (gethostname(host_name, sizeof(host_name)) == -1) {
-            perror("gethostname() error");
-            exit(EXIT_FAILURE);
-        }
-        sprintf(prompt, " %s %s \n%s@%s # "
-                , PROMPT_STR
-                , cwd
-                , getenv("LOGNAME")
-                , host_name
-            );
-        fputs(prompt, stdout);
         memset(str, 0, MAX_STR_LEN);
         ret_val = fgets(str, MAX_STR_LEN, stdin);
 
@@ -230,6 +231,7 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
             print_hist_list(hist_list);
         }
         else {
+            fprintf(stdout, "%s \n", cmd->cmd);
             // A single command to create and exec
             // If you really do things correctly, you don't need a special call
             // for a single command, as distinguished from multiple commands.
@@ -433,7 +435,7 @@ print_hist_list(hist_list_t *hist_list)
 }
 
 void
-sigint_handler(int sig)
+sigint_handler(__attribute__((unused)) int sig)
 {
     fprintf(stdout, "\n");
     fprintf(stdout, "child kill\n");
