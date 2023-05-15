@@ -33,8 +33,9 @@ process_user_input_simple(void)
     cmd_list_t *cmd_list = NULL;
     hist_list_t *hist_list = NULL;
     int *count_ptr = NULL;
+    int cmd_count;
     
-    int cmd_count = 0;
+    cmd_count = 0;
     count_ptr = &cmd_count;
     hist_list = (hist_list_t *) calloc(1, sizeof(hist_list_t));
     hist_list->count = 0;
@@ -114,6 +115,8 @@ process_user_input_simple(void)
         exec_commands(cmd_list, hist_list);
 
         free_list(cmd_list);
+
+        signal(SIGINT, sigint_handler);
     }
     free_hist_list(hist_list);
 
@@ -428,6 +431,15 @@ print_hist_list(hist_list_t *hist_list)
     }
     fprintf(stdout,"\n");
 }
+
+void
+sigint_handler(int sig)
+{
+    fprintf(stdout, "\n");
+    fprintf(stdout, "child kill\n");
+    fprintf(stdout, "\n");
+}
+
 
 // Remember how I told you that use of alloca() is
 // dangerous? You can trust me. I'm a professional.

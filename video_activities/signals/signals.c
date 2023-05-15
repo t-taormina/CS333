@@ -72,7 +72,6 @@ void
 sigint_handler(int sig)
 {
     printf("Signal for %d caught\n", sig);
-    printf("It takes more than that to slay me.\n");
 }
 
 void 

@@ -18,7 +18,7 @@ main(int argc, char **argv)
     char *lines = NULL;
     char *file_name = NULL;
 
-    {
+   {
         int c = 0;
         while((c = getopt(argc, argv, OPTIONS)) != -1) {
             switch(c) {

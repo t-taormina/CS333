@@ -86,5 +86,6 @@ void build_hist(struct hist_s *, char *);
 void exec_commands(cmd_list_t *cmds, hist_list_t *hist_list);
 int  process_user_input_simple(void);
 void simple_argv(int argc, char *argv[]);
+void sigint_handler(int);
 
 #endif // _CMD_PARSE_H
