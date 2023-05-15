@@ -76,6 +76,7 @@ void parse_commands(cmd_list_t *cmd_list);
 void free_list(struct cmd_list_s *);
 void print_list(struct cmd_list_s *);
 void free_cmd(struct cmd_s *);
+void insert_cmd(struct cmd_list_s *, struct cmd_s *, char *, int *);
 void print_cmd(struct cmd_s *);
 void insert_hist(struct hist_list_s *, struct hist_s *);
 void free_hist_list(struct hist_list_s *);

@@ -25,15 +25,17 @@ int
 process_user_input_simple(void)
 {
     char str[MAX_STR_LEN] = {'\0'};
+    char prompt[PROMPT_LEN] = {'\0'};
     char cwd[60] = {'\0'};
     char host_name[20] = {'\0'};
     char *ret_val = NULL;
     char *raw_cmd = NULL;
     cmd_list_t *cmd_list = NULL;
     hist_list_t *hist_list = NULL;
+    int *count_ptr = NULL;
     
     int cmd_count = 0;
-    char prompt[PROMPT_LEN] = {'\0'};
+    count_ptr = &cmd_count;
     hist_list = (hist_list_t *) calloc(1, sizeof(hist_list_t));
     hist_list->count = 0;
 
@@ -100,25 +102,9 @@ process_user_input_simple(void)
 
         cmd_list = (cmd_list_t *) calloc(1, sizeof(cmd_list_t));
 
-        // This block should probably be put into its own function.
-        cmd_count = 0;
         while (raw_cmd != NULL ) {
             cmd_t *cmd = (cmd_t *) calloc(1, sizeof(cmd_t));
-
-            cmd->raw_cmd = strdup(raw_cmd);
-            cmd->list_location = cmd_count++;
-
-            if (cmd_list->head == NULL) {
-                // An empty list.
-                cmd_list->tail = cmd_list->head = cmd;
-            }
-            else {
-                // Make this the last in the list of cmds
-                cmd_list->tail->next = cmd;
-                cmd_list->tail = cmd;
-            }
-            cmd_list->count++;
-
+            insert_cmd(cmd_list, cmd, raw_cmd, count_ptr);
             // Get the next raw command.
             raw_cmd = strtok(NULL, PIPE_DELIM);
         }
@@ -377,6 +363,23 @@ free_hist (hist_t *hist)
         free(hist);
         hist = NULL;
     }
+}
+
+void 
+insert_cmd(cmd_list_t *cmd_list, cmd_t *cmd, char *raw_cmd, int *count)
+{
+    cmd->raw_cmd = strdup(raw_cmd);
+    cmd->list_location = (*count)++;
+    if (cmd_list->head == NULL) {
+        // An empty list.
+        cmd_list->tail = cmd_list->head = cmd;
+    }
+    else {
+        // Make this the last in the list of cmds
+        cmd_list->tail->next = cmd;
+        cmd_list->tail = cmd;
+    }
+    cmd_list->count++;
 }
 
 // Oooooo, this is nice. Show the fully parsed command line in a nice
