@@ -216,6 +216,7 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
 
             getcwd(str, MAXPATHLEN); 
             fprintf(stdout, " " CWD_CMD ": %s\n", str);
+            fprintf(stdout, "\n");
         }
 
         /* Echo command */
@@ -252,10 +253,10 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
                 exit(EXIT_FAILURE);
             }
             if (0 == pid) { /* Child process */
-
                 int i, size;
                 char **c_argv = NULL; /*child process argv*/
 
+                signal(SIGINT, SIG_DFL);
                 if (is_verbose) {
                     fprintf(stderr, "in child process\n");
                 }
@@ -547,7 +548,7 @@ print_hist_list(hist_list_t *hist_list)
 void
 sigint_handler(__attribute__((unused)) int sig)
 {
-    signal(SIGINT, sigint_handler);
+    signal(SIGINT, SIG_IGN);
     fprintf(stdout, "\nchild kill\n");
 }
 

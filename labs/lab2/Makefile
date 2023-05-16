@@ -28,7 +28,7 @@ clean cls:
 	rm -f $(PROGS) *.o *~ \#*
 
 test:
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out.txt ./psush -v
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out.txt ./psush
 
 tar: 
 	tar cvfa bin_files_taormina.tar.gz *.[ch] [mM]akefile
