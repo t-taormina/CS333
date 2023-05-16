@@ -13,6 +13,7 @@
 #include <time.h>
 #include <signal.h>
 #include <fcntl.h>
+#include <errno.h>
 
 #include "cmd_parse.h"
 
@@ -236,6 +237,8 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
         else if (0 == strcmp(cmd->cmd, HISTORY_CMD)) {
             print_hist_list(hist_list);
         }
+
+        /* Exec Command */
         else {
             // A single command to create and exec
             // If you really do things correctly, you don't need a special call
@@ -249,44 +252,96 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
                 exit(EXIT_FAILURE);
             }
             if (0 == pid) { /* Child process */
-                int i;
-                char **c_argv = NULL; /*child process argv*/
-                char *c_cmd = NULL;
 
+                int i, size;
+                char **c_argv = NULL; /*child process argv*/
+
+                if (is_verbose) {
+                    fprintf(stderr, "in child process\n");
+                }
+                size = cmd->param_count + 2; /* */
+
+                if (cmd->input_src == REDIRECT_FILE) {
+                }
                 // Check for redirect and alter stdout/stdin as needed
-                if (cmd->output_dest == REDIRECT_FILE) {
-                    int ofd = open(cmd->output_file_name, O_WRONLY| O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
-                    dup2(ofd, 1);
+                if (REDIRECT_FILE == cmd->output_dest) {
+                    int ofd;
+
+                    if (is_verbose) {
+                        fprintf(stderr, "redirecting output file\n");
+                    }
+
+                    ofd = open(cmd->output_file_name, O_WRONLY| O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+                    if (ofd < 0) {
+                        fprintf(stderr
+                                , "******* redir in failed %d *******\n", errno);
+                        _exit(7);
+                    }
+                    dup2(ofd, STDOUT_FILENO);
                     close(ofd);
                 }
 
-                if (cmd->input_src == REDIRECT_FILE) {
-                    int ifd = open(cmd->input_file_name, O_RDONLY); 
-                    if (ifd == -1)
-                        perror("open input failure");
-                    dup2(ifd, 0);
+                if (REDIRECT_FILE == cmd->input_src) {
+                    int ifd;
+
+                    if (is_verbose) {
+                        fprintf(stderr, "redirecting input file\n");
+                    }
+
+                    size++;
+                    fprintf(stderr, "%s\n", cmd->input_file_name);
+                    ifd = open(cmd->input_file_name, O_RDONLY); 
+                    if (ifd < 0){
+                        fprintf(stderr
+                                , "******* redir in failed %d *******\n", errno);
+                        _exit(7);
+                    }
+                    dup2(ifd, STDIN_FILENO);
+                    fprintf(stderr, "dup2\n");
                     close(ifd);
+
+                    if (is_verbose) {
+                        fprintf(stderr, "closed input file\n");
+                    }
+
+                }
+
+                if (size > 0) {
+                    c_argv = (char **) calloc((size),sizeof(char *));
+                    c_argv[0] = cmd->cmd;
+                    if (cmd->param_count > 0) {
+                        param = cmd->param_list;
+                        i = 1;
+                        while(NULL != param) {
+                            c_argv[i] = param->param;
+                            param = param->next;
+                            i++;
+                        }
+                    }
+                    else {
+                        c_argv[1] = cmd->input_file_name;
+                    }
                 }
 
 
-                param = cmd->param_list;
-                c_argv = (char **) calloc((cmd->param_count + 2),sizeof(char *));
-                c_cmd = cmd->cmd;
-                c_argv[0] = c_cmd;
-                i = 1;
-                while(NULL != param) {
-                    c_argv[i] = param->param;
-                    param = param->next;
-                    i++;
+
+                if (is_verbose) {
+                    fprintf(stderr, "execing in child process\n");
                 }
+
                 status = execvp(c_argv[0], c_argv);
                 perror("child failed exec");
-                fprintf(stderr, "*** %d: %s failed %d ***\n", pid, c_cmd, status);  
+                fprintf(stderr, "*** %d: %s failed %d ***\n", pid, c_argv[0], status);  
                 fflush(stderr);                                             
                 _exit(EXIT_FAILURE);
             }
             else { /* Parent process */
                 int stat_loc;
+
+                if (is_verbose) {
+                    fprintf(stderr, "waiting in parent process\n");
+                }
+
                 pid = wait(&stat_loc);
                 fprintf(stdout, "\n");
             }
