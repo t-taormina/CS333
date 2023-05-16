@@ -9,8 +9,10 @@
 #include <stdlib.h>
 #include <sys/param.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
 #include <time.h>
 #include <signal.h>
+#include <fcntl.h>
 
 #include "cmd_parse.h"
 
@@ -175,6 +177,8 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
         if (!cmd->cmd) {
             return;
         }
+
+
         if (0 == strcmp(cmd->cmd, CD_CMD)) {
             if (0 == cmd->param_count) {
                 if (NULL == (home = getenv("HOME")))
@@ -210,7 +214,7 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
             char str[MAXPATHLEN];
 
             getcwd(str, MAXPATHLEN); 
-            printf(" " CWD_CMD ": %s\n", str);
+            fprintf(stdout, " " CWD_CMD ": %s\n", str);
         }
 
         /* Echo command */
@@ -233,52 +237,60 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
             print_hist_list(hist_list);
         }
         else {
+            // A single command to create and exec
+            // If you really do things correctly, you don't need a special call
+            // for a single command, as distinguished from multiple commands.
             pid_t pid, wpid;
             int status;
 
             pid = wpid = -1;
-            pid = fork();
-            switch (pid) {
-                case -1: 
-                    perror("fork failed");
-                    exit(EXIT_FAILURE);
-                    break;
-                case 0:
-                    {
-                        int i;
-                        char **c_argv = NULL; /*child process argv*/
-                        char *c_cmd = NULL;
-                        param = cmd->param_list;
+            if((pid = fork()) == -1) {
+                perror("fork failed");
+                exit(EXIT_FAILURE);
+            }
+            if (0 == pid) { /* Child process */
+                int i;
+                char **c_argv = NULL; /*child process argv*/
+                char *c_cmd = NULL;
 
-                        c_argv = (char **) calloc((cmd->param_count + 2),sizeof(char *));
-                        c_cmd = cmd->cmd;
-                        c_argv[0] = c_cmd;
-                        i = 1;
-                        while(NULL != param) {
-                            c_argv[i] = param->param;
-                            param = param->next;
-                            i++;
-                        }
-                        execvp(c_argv[0], c_argv);
-                        perror("child failed exec");
-                        fprintf(stderr, "*** %d: %s failed ***\n", getpid(), c_cmd);  
-                        fflush(stderr);                                             
-                        _exit(EXIT_FAILURE);
-                    }
-                    break;
+                // Check for redirect and alter stdout/stdin as needed
+                if (cmd->output_dest == REDIRECT_FILE) {
+                    int ofd = open(cmd->output_file_name, O_WRONLY| O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+                    dup2(ofd, 1);
+                    close(ofd);
+                }
 
-                default:
-                    {
-                        do {
-                            wpid = waitpid(pid, &status, WUNTRACED);
-                        } while (!WIFEXITED(status) && !WIFSIGNALED(status));
-                        fprintf(stdout, "\n");  
-                    }
+                if (cmd->input_src == REDIRECT_FILE) {
+                    int ifd = open(cmd->input_file_name, O_RDONLY); 
+                    if (ifd == -1)
+                        perror("open input failure");
+                    dup2(ifd, 0);
+                    close(ifd);
+                }
+
+
+                param = cmd->param_list;
+                c_argv = (char **) calloc((cmd->param_count + 2),sizeof(char *));
+                c_cmd = cmd->cmd;
+                c_argv[0] = c_cmd;
+                i = 1;
+                while(NULL != param) {
+                    c_argv[i] = param->param;
+                    param = param->next;
+                    i++;
+                }
+                status = execvp(c_argv[0], c_argv);
+                perror("child failed exec");
+                fprintf(stderr, "*** %d: %s failed %d ***\n", pid, c_cmd, status);  
+                fflush(stderr);                                             
+                _exit(EXIT_FAILURE);
+            }
+            else { /* Parent process */
+                int stat_loc;
+                pid = wait(&stat_loc);
+                fprintf(stdout, "\n");
             }
         }
-        // A single command to create and exec
-        // If you really do things correctly, you don't need a special call
-        // for a single command, as distinguished from multiple commands.
     }
     else {
         // Other things???
