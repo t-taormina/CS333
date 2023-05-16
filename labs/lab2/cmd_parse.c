@@ -8,7 +8,9 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/param.h>
+#include <sys/wait.h>
 #include <time.h>
+#include <signal.h>
 
 #include "cmd_parse.h"
 
@@ -35,6 +37,7 @@ process_user_input_simple(void)
     int *count_ptr = NULL;
     int cmd_count;
     
+    signal(SIGINT, sigint_handler);
     cmd_count = 0;
     count_ptr = &cmd_count;
     hist_list = (hist_list_t *) calloc(1, sizeof(hist_list_t));
@@ -117,7 +120,6 @@ process_user_input_simple(void)
 
         free_list(cmd_list);
 
-        signal(SIGINT, sigint_handler);
     }
     free_hist_list(hist_list);
 
@@ -231,11 +233,51 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
             print_hist_list(hist_list);
         }
         else {
-            fprintf(stdout, "%s \n", cmd->cmd);
-            // A single command to create and exec
-            // If you really do things correctly, you don't need a special call
-            // for a single command, as distinguished from multiple commands.
+            pid_t pid, wpid;
+            int status;
+
+            pid = wpid = -1;
+            pid = fork();
+            switch (pid) {
+                case -1: 
+                    perror("fork failed");
+                    exit(EXIT_FAILURE);
+                    break;
+                case 0:
+                    {
+                        int i;
+                        char **c_argv = NULL; /*child process argv*/
+                        char *c_cmd = NULL;
+                        param = cmd->param_list;
+
+                        c_argv = (char **) calloc((cmd->param_count + 2),sizeof(char *));
+                        c_cmd = cmd->cmd;
+                        c_argv[0] = c_cmd;
+                        i = 1;
+                        while(NULL != param) {
+                            c_argv[i] = param->param;
+                            param = param->next;
+                            i++;
+                        }
+                        execvp(c_argv[0], c_argv);
+                        perror("child failed exec");
+                        fprintf(stderr, "*** %d: %s failed ***\n", getpid(), c_cmd);  
+                        fflush(stderr);                                             
+                        _exit(EXIT_FAILURE);
+                    }
+                    break;
+
+                default:
+                    {
+                        do {
+                            wpid = waitpid(pid, &status, WUNTRACED);
+                        } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+                    }
+            }
         }
+        // A single command to create and exec
+        // If you really do things correctly, you don't need a special call
+        // for a single command, as distinguished from multiple commands.
     }
     else {
         // Other things???
@@ -437,9 +479,9 @@ print_hist_list(hist_list_t *hist_list)
 void
 sigint_handler(__attribute__((unused)) int sig)
 {
-    fprintf(stdout, "\n");
-    fprintf(stdout, "child kill\n");
-    fprintf(stdout, "\n");
+    signal(SIGINT, sigint_handler);
+    fprintf(stderr, "\nchild kill\n");
+    fflush(stderr);
 }
 
 
