@@ -272,6 +272,7 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
                         do {
                             wpid = waitpid(pid, &status, WUNTRACED);
                         } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+                        fprintf(stdout, "\n");  
                     }
             }
         }
@@ -386,10 +387,10 @@ free_cmd (cmd_t *cmd)
             free(temp);
             temp = NULL;
         }
-        //if (cmd->input_file_name != NULL)
-            //free(cmd->input_file_name);
-        //if (cmd->output_file_name != NULL)
-            //free(cmd->output_file_name);
+        if (cmd->input_file_name != NULL)
+            free(cmd->input_file_name);
+        if (cmd->output_file_name != NULL)
+            free(cmd->output_file_name);
         free(cmd);
         cmd = NULL;
     }
@@ -480,8 +481,7 @@ void
 sigint_handler(__attribute__((unused)) int sig)
 {
     signal(SIGINT, sigint_handler);
-    fprintf(stderr, "\nchild kill\n");
-    fflush(stderr);
+    fprintf(stdout, "\nchild kill\n");
 }
 
 
