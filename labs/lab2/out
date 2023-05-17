@@ -1,0 +1,16 @@
+total 137
+drwxr-xr-x 2 taormina them    15 May 16 20:53 .
+drwx------ 4 taormina them     4 May 16 16:32 ..
+-rw------- 1 taormina them 20311 May 16 20:52 cmd_parse.c
+-rw------- 1 taormina them 20206 May 16 20:43 cmd_parse.c~
+-rw------- 1 taormina them  2167 May 16 16:31 cmd_parse.h
+-rw------- 1 taormina them 34408 May 16 20:53 cmd_parse.o
+-rw------- 1 taormina them   625 May 16 20:34 JUNK
+-rw------- 1 taormina them   796 May 16 16:31 Makefile
+-rw------- 1 taormina them     0 May 16 21:41 out
+-rw------- 1 taormina them    12 May 16 20:54 out2
+-rwx------ 1 taormina them 32176 May 16 20:53 psush
+-rw------- 1 taormina them   658 May 16 16:31 psush.c
+-rw------- 1 taormina them   594 May 16 20:19 psush_example.c
+-rw------- 1 taormina them  3952 May 16 20:31 psush.o
+-rw------- 1 taormina them  9492 May 16 21:41 valgrind-out.txt
