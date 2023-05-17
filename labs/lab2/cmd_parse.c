@@ -61,7 +61,6 @@ process_user_input_simple(void)
                 exit(EXIT_FAILURE);
             }
 
-
             /* Get info for command prompt - username */
             if (gethostname(host_name, sizeof(host_name)) == -1) {
                 perror("gethostname() error");
@@ -185,7 +184,6 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
             return;
         }
 
-
         if (0 == strcmp(cmd->cmd, CD_CMD)) {
             if (0 == cmd->param_count) {
                 if (NULL == (home = getenv("HOME")))
@@ -193,7 +191,7 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
                 if (-1 == chdir(home)){
                     perror("psuSH: cd: home: ");
                 }
-                fprintf(stdout, "\n");
+                //fprintf(stdout, "\n");
             }
             else {
                 // try and cd to the target directory. It would be good to check
@@ -202,7 +200,7 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
                     char str[MAXPATHLEN];
                     getcwd(str, MAXPATHLEN); 
                     fprintf(stdout, "%s\n", str);
-                    fprintf(stdout, "\n");
+                    //fprintf(stdout, "\n");
                 }
                 else {
                     fprintf(stderr, "psuSH: cd: %s: ", cmd->param_list->param);
@@ -218,7 +216,7 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
 
             getcwd(str, MAXPATHLEN); 
             fprintf(stdout, " " CWD_CMD ": %s\n", str);
-            fprintf(stdout, "\n");
+            //fprintf(stdout, "\n");
         }
 
         /* Echo command */
@@ -232,7 +230,7 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
                     param = param->next;
                 }
                 fprintf(stdout, "\n");
-                fprintf(stdout, "\n");
+                //fprintf(stdout, "\n");
             }
         }
 
@@ -322,6 +320,9 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
                 perror("child failed exec");
                 fprintf(stderr, "*** %d: %s failed %d ***\n", pid, c_argv[0], status);  
                 fflush(stderr);                                             
+                free(c_argv);
+                free_list(cmds);
+                free_hist_list(hist_list);
                 _exit(EXIT_FAILURE);
             }
             else { /* Parent process */
@@ -350,6 +351,7 @@ free_list(cmd_list_t *cmd_list)
         temp = cmd_list->head;
         cmd_list->head = cmd_list->head->next;
         free_cmd(temp); 
+        temp = NULL;
     }
     free(cmd_list);
     cmd_list = NULL;
@@ -363,6 +365,7 @@ free_hist_list(hist_list_t *hist_list)
         temp = hist_list->head;
         hist_list->head = hist_list->head->next;
         free_hist(temp);
+        temp = NULL;
     }
     free(hist_list);
     hist_list = NULL;
@@ -529,7 +532,7 @@ print_hist_list(hist_list_t *hist_list)
         temp = temp->next;
         count++;
     }
-    fprintf(stdout,"\n");
+    //fprintf(stdout,"\n");
 }
 
 void

@@ -20,7 +20,6 @@
 # define SPACE_DELIM " "
 # define REDIR_IN    "<"
 # define REDIR_OUT   ">"
-//# define BACKGROUND_CHAR   "&"
 
 # define PROMPT_STR "PSUsh"
 
