@@ -36,8 +36,6 @@ process_user_input_simple(void)
     char host_name[20] = {'\0'};
     char *ret_val = NULL;
     char *raw_cmd = NULL;
-
-
     cmd_list_t *cmd_list = NULL;
     hist_list_t *hist_list = NULL;
     int cmd_count;
@@ -46,8 +44,7 @@ process_user_input_simple(void)
     cmd_count = 0;
     hist_list = (hist_list_t *) calloc(1, sizeof(hist_list_t));
     hist_list->count = 0;
-    signal(SIGINT, sigint_handler);
-	
+
     for ( ; ; ) {
         hist_t *hist = NULL;
 
@@ -88,6 +85,7 @@ process_user_input_simple(void)
             // replace the newline with a NULL
             str[strlen(str) - 1] = '\0';
         }
+
         if (strlen(str) == 0) {
             // An empty command line.
             // Just jump back to the promt and fgets().
@@ -111,26 +109,21 @@ process_user_input_simple(void)
         // Basic commands are pipe delimited.
         // This is really for Stage 2.
         raw_cmd = strtok(str, PIPE_DELIM);
-
         cmd_list = (cmd_list_t *) calloc(1, sizeof(cmd_list_t));
-
         cmd_count = 0;
+
         while (raw_cmd != NULL ) {
-          cmd_t *cmd = (cmd_t *) calloc(1, sizeof(cmd_t));
-          insert_cmd(cmd_list, cmd, raw_cmd, &cmd_count);
-	    
+            cmd_t *cmd = (cmd_t *) calloc(1, sizeof(cmd_t));
+            insert_cmd(cmd_list, cmd, raw_cmd, &cmd_count);
             // Get the next raw command.
             raw_cmd = strtok(NULL, PIPE_DELIM);
         }
 
         parse_commands(cmd_list);
-
         exec_commands(cmd_list, hist_list);
-
         free_list(cmd_list);
     }
     free_hist_list(hist_list);
-
     return(EXIT_SUCCESS);
 }
 
@@ -163,7 +156,7 @@ simple_argv(int argc, char *argv[])
                 break;
             default:
                 fprintf(stderr, "*** Oops, something strange happened <%c> ... ignoring ...***\n", opt);
-               break;
+                break;
         }
     }
 }
@@ -298,7 +291,7 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
                     close(ifd);
 
                     if (is_verbose) {
-                      fprintf(stderr, "closed input file\n");
+                        fprintf(stderr, "closed input file\n");
                     }
                 }
 
@@ -306,14 +299,14 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
                 c_argv = (char **) calloc((size),sizeof(char *));
                 c_argv[0] = cmd->cmd;
                 for(param = cmd->param_list; param ; param = param->next) {
-                  if (is_verbose) {
-                    fprintf(stderr, "***** %d >%s< %d\n", __LINE__, param->param, i);
-                  }
-                  c_argv[i++] = param->param;
+                    if (is_verbose) {
+                        fprintf(stderr, "***** %d >%s< %d\n", __LINE__, param->param, i);
+                    }
+                    c_argv[i++] = param->param;
                 }
 
                 if (is_verbose) {
-                  fprintf(stderr, "execing in child process\n");
+                    fprintf(stderr, "execing in child process\n");
                 }
 
                 status = execvp(c_argv[0], c_argv);
@@ -337,9 +330,9 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
         }
     }
     else {
-        // Other things???
-        // More than one command on the command line. Who'da thunk it!
-        // This really falls into Stage 2.
+        if (is_verbose) {
+            fprintf(stderr, "exec multiple commands\n");
+        }
     }
 }
 
@@ -383,10 +376,10 @@ build_hist(hist_t *hist, char *str)
         perror("localtime error");
     }
     if (strftime(timestr, sizeof(timestr), "%Y-%m-%d %H:%M:%S", 
-          tm) == 0) {
+                tm) == 0) {
         perror("strftime() error");
     }
-    
+
     hist->hist = strdup(str);
     hist->time_str = strdup(timestr);
 }
@@ -475,7 +468,7 @@ void
 insert_cmd(cmd_list_t *cmd_list, cmd_t *cmd, char *raw_cmd, int *count)
 {
     cmd->raw_cmd = strdup(raw_cmd);
-    cmd->list_location = (*count)++;
+    cmd->list_location = (*count);
     if (cmd_list->head == NULL) {
         // An empty list.
         cmd_list->tail = cmd_list->head = cmd;
@@ -485,11 +478,11 @@ insert_cmd(cmd_list_t *cmd_list, cmd_t *cmd, char *raw_cmd, int *count)
         cmd_list->tail->next = cmd;
         cmd_list->tail = cmd;
     }
+    (*count)++;
     cmd_list->count++;
 }
 
-// Oooooo, this is nice. Show the fully parsed command line in a nice
-// easy to read and digest format.
+// Show the fully parsed command line in a nice easy to read and digest format.
 void
 print_cmd(cmd_t *cmd)
 {
@@ -509,10 +502,10 @@ print_cmd(cmd_t *cmd)
 
     fprintf(stderr,"\tinput source: %s\n"
             , (cmd->input_src == REDIRECT_FILE ? "redirect file" :
-               (cmd->input_src == REDIRECT_PIPE ? "redirect pipe" : "redirect none")));
+                (cmd->input_src == REDIRECT_PIPE ? "redirect pipe" : "redirect none")));
     fprintf(stderr,"\toutput dest:  %s\n"
             , (cmd->output_dest == REDIRECT_FILE ? "redirect file" :
-               (cmd->output_dest == REDIRECT_PIPE ? "redirect pipe" : "redirect none")));
+                (cmd->output_dest == REDIRECT_PIPE ? "redirect pipe" : "redirect none")));
     fprintf(stderr,"\tinput file name:  %s\n"
             , (NULL == cmd->input_file_name ? "<na>" : cmd->input_file_name));
     fprintf(stderr,"\toutput file name: %s\n"
@@ -532,7 +525,6 @@ print_hist_list(hist_list_t *hist_list)
         temp = temp->next;
         count++;
     }
-    //fprintf(stdout,"\n");
 }
 
 void
@@ -540,8 +532,8 @@ sigint_handler(__attribute__((unused)) int sig)
 {
     signal(SIGINT, sigint_handler);
     if (chld_pid) {
-      kill(chld_pid, SIGINT);
-      fprintf(stdout, "\nchild kill\n");
+        kill(chld_pid, SIGINT);
+        fprintf(stdout, "\nchild kill\n");
     }
     chld_pid = 0;
 }
@@ -617,7 +609,7 @@ parse_commands(cmd_list_t *cmd_list)
             }
             else if (strcmp(arg, REDIR_OUT) == 0) {
                 // redirect stdout
-                       
+
                 //
                 // If the output_dest is something other than REDIRECT_NONE, then
                 // this is an improper command.
@@ -658,20 +650,15 @@ parse_commands(cmd_list_t *cmd_list)
         }
         // This could overwite some bogus file redirection.
         if (cmd->list_location > 0) {
-          cmd->input_src = REDIRECT_PIPE;
-          fprintf(stderr, "%d \n", __LINE__);
+            cmd->input_src = REDIRECT_PIPE;
         }
         if (cmd->list_location < (cmd_list->count - 1)) {
             cmd->output_dest = REDIRECT_PIPE;
-	    fprintf(stderr, "%d \n", __LINE__);
         }
 
         // No need free with alloca memory.
         //free(raw);
         cmd = cmd->next;
     }
-
-    if (is_verbose > 0) {
-        print_list(cmd_list);
-    }
+    if (is_verbose > 0) { print_list(cmd_list); }
 }
