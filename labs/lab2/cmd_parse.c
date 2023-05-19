@@ -329,7 +329,17 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
             }
         }
     }
-    else {
+    else { // More than one command in the command list
+        i = 1;
+        c_argv = (char **) calloc((size),sizeof(char *));
+        c_argv[0] = cmd->cmd;
+        for(param = cmd->param_list; param ; param = param->next) {
+            if (is_verbose) {
+                fprintf(stderr, "***** %d >%s< %d\n", __LINE__, param->param, i);
+            }
+            c_argv[i++] = param->param;
+        }
+
         if (is_verbose) {
             fprintf(stderr, "exec multiple commands\n");
         }
