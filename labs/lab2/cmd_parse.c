@@ -333,7 +333,7 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
     else {         
         pid_t pid = -1;
         int fd[2 * cmds->count];
-        int i, j;
+        int i, j, k;
 
         /* Create pipes */
         for (i = 0; i < cmds->count; i++) {
@@ -351,21 +351,73 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
         // Indicate if there is a previous command that needs piping
         j = 0;
 
+        // cmd = cmds->head; 
         while (cmd) {
             if ((pid = fork()) == -1) {
                 perror("fork error");
                 exit(EXIT_FAILURE);
             }
 
-        }
+            // Child process
+            else if (pid == 0) {
+                char **c_argv = NULL; /*child process argv*/
+                int size, status;
 
-        c_argv = (char **) calloc((size),sizeof(char *));
-        c_argv[0] = cmd->cmd;
-        for(param = cmd->param_list; param ; param = param->next) {
-            if (is_verbose) {
-                fprintf(stderr, "***** %d >%s< %d\n", __LINE__, param->param, i);
-            }
-            c_argv[i++] = param->param;
+                if (cmd->next != NULL) {
+                    if ((dup2(fd[j+1], STDOUT_FILENO)) < 0) {
+                        perror("dup2 error");
+                        exit(EXIT_FAILURE);
+                    }
+                }
+
+                // Is there a previous? 
+                if (j != 0) {
+                    if ((dup2(fd[j-2], STDIN_FILENO)) < 0) {
+                        perror("dup2 error");
+                        exit(EXIT_FAILURE);
+                    }
+                }
+
+                // Close child process file descriptors
+                for (i = 0; i < cmds->count * 2; i++) {
+                    close(fd[i]);
+                }
+
+                // Build child argv for exec
+                k = 1;
+                size = cmd->param_count + 2;
+                c_argv = (char **) calloc((size),sizeof(char *));
+                c_argv[0] = cmd->cmd;
+                for(param = cmd->param_list; param ; param = param->next) {
+                    if (is_verbose) {
+                        fprintf(stderr, "***** %d >%s< %d\n", __LINE__, param->param, k);
+                    }
+                    c_argv[k++] = param->param;
+                }
+
+                // Exec 
+                if (is_verbose) {
+                    fprintf(stderr, "execing in child process\n");
+                }
+
+                status = execvp(c_argv[0], c_argv);
+                perror("child failed exec");
+                fprintf(stderr, "*** %d: %s failed %d ***\n", pid, c_argv[0], status);  
+                fflush(stderr);                                             
+                free(c_argv);
+                free_list(cmds);
+                free_hist_list(hist_list);
+                _exit(EXIT_FAILURE);
+            } 
+            cmd = cmd->next;
+            j += 2;
+        }
+        
+        for (i = 0; i < cmds->count * 2; i++) {
+            close(fd[i]);
+        }
+        for (i = 0; i < cmds->count; i++) {
+            wait(NULL);
         }
 
         if (is_verbose) {
