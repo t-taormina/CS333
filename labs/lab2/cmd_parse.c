@@ -324,13 +324,41 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
                 if (is_verbose) {
                     fprintf(stderr, "waiting in parent process\n");
                 }
-
                 pid = wait(&stat_loc);
             }
         }
     }
-    else { // More than one command in the command list
-        i = 1;
+
+    // More than one command in the command list (pipes)
+    else {         
+        pid_t pid = -1;
+        int fd[2 * cmds->count];
+        int i, j;
+
+        /* Create pipes */
+        for (i = 0; i < cmds->count; i++) {
+            /* 
+             * EXPLAIN pipe(fd + i * 2) -> 
+             */
+            if (pipe(fd + i * 2) < 0) { 
+                perror("pipe error\n");
+                exit(EXIT_FAILURE);
+            }
+        }
+
+        /*Create processes and assign pipes*/
+
+        // Indicate if there is a previous command that needs piping
+        j = 0;
+
+        while (cmd) {
+            if ((pid = fork()) == -1) {
+                perror("fork error");
+                exit(EXIT_FAILURE);
+            }
+
+        }
+
         c_argv = (char **) calloc((size),sizeof(char *));
         c_argv[0] = cmd->cmd;
         for(param = cmd->param_list; param ; param = param->next) {
