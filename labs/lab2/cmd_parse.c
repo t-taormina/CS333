@@ -254,7 +254,6 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
                 if (is_verbose) {
                     fprintf(stderr, "in child process\n");
                 }
-                size = cmd->param_count + 2; /* +2 for the command and the null*/
 
                 // Check for redirect and alter stdout/stdin as needed
                 if (REDIRECT_FILE == cmd->output_dest) {
@@ -296,6 +295,7 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
                 }
 
                 i = 1;
+                size = cmd->param_count + 2; /* +2 for the command and the null*/
                 c_argv = (char **) calloc((size),sizeof(char *));
                 c_argv[0] = cmd->cmd;
                 for(param = cmd->param_list; param ; param = param->next) {
@@ -363,6 +363,48 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
                 char **c_argv = NULL; /*child process argv*/
                 int size, status;
 
+                // Check for redirect and alter stdout
+                if (REDIRECT_FILE == cmd->output_dest) {
+                    int ofd;
+
+                    if (is_verbose) {
+                        fprintf(stderr, "redirecting output file\n");
+                    }
+
+                    ofd = open(cmd->output_file_name, O_WRONLY| O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+                    if (ofd < 0) {
+                        fprintf(stderr
+                                , "******* redir in failed %d *******\n", errno);
+                        _exit(7);
+                    }
+                    dup2(ofd, STDOUT_FILENO);
+                    close(ofd);
+                }
+
+                // Check for redirect and alter stdin
+                if (REDIRECT_FILE == cmd->input_src) {
+                    int ifd;
+
+                    if (is_verbose) {
+                        fprintf(stderr, "redirecting input file\n");
+                    }
+
+                    ifd = open(cmd->input_file_name, O_RDONLY); 
+                    if (ifd < 0){
+                        fprintf(stderr
+                                , "******* redir in failed %d *******\n", errno);
+                        _exit(7);
+                    }
+                    dup2(ifd, STDIN_FILENO);
+                    close(ifd);
+
+                    if (is_verbose) {
+                        fprintf(stderr, "closed input file\n");
+                    }
+                }
+
+
+                // Is there a next? Set
                 if (cmd->next != NULL) {
                     if ((dup2(fd[j+1], STDOUT_FILENO)) < 0) {
                         perror("dup2 error");
