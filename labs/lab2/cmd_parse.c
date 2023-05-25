@@ -99,12 +99,10 @@ process_user_input_simple(void)
         }
 
         // I put the update of the history of command in here.
-        if (strcmp(str, HISTORY_CMD) != 0) {
-            // Handle time of command
-            hist = (hist_t *) calloc(1, sizeof(hist_t));
-            build_hist(hist, str);
-            insert_hist(hist_list, hist);
-        }
+        // Handle time of command
+        hist = (hist_t *) calloc(1, sizeof(hist_t));
+        build_hist(hist, str);
+        insert_hist(hist_list, hist);
 
         // Basic commands are pipe delimited.
         // This is really for Stage 2.
@@ -325,6 +323,7 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
                     fprintf(stderr, "waiting in parent process\n");
                 }
                 pid = wait(&stat_loc);
+                chld_pid = 0;
             }
         }
     }
@@ -460,6 +459,7 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
         }
         for (i = 0; i < cmds->count; i++) {
             wait(NULL);
+            chld_pid = 0;
         }
 
         if (is_verbose) {
@@ -665,7 +665,7 @@ sigint_handler(__attribute__((unused)) int sig)
     signal(SIGINT, sigint_handler);
     if (chld_pid) {
         kill(chld_pid, SIGINT);
-        fprintf(stdout, "\nchild kill\n");
+        fprintf(stdout, "child kill\n");
     }
     chld_pid = 0;
 }
