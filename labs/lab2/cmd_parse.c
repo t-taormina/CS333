@@ -36,9 +36,9 @@ process_user_input_simple(void)
     char host_name[20] = {'\0'};
     char *ret_val = NULL;
     char *raw_cmd = NULL;
+    int cmd_count;
     cmd_list_t *cmd_list = NULL;
     hist_list_t *hist_list = NULL;
-    int cmd_count;
 
     signal(SIGINT, sigint_handler);
     cmd_count = 0;
@@ -48,7 +48,7 @@ process_user_input_simple(void)
     for ( ; ; ) {
         hist_t *hist = NULL;
 
-        // Set up a cool user prompt.
+        // Set up user prompt.
         // test to see of stdout is a terminal device (a tty)
         if (isatty(fileno(stdout)))
         {
@@ -98,8 +98,7 @@ process_user_input_simple(void)
             break;
         }
 
-        // I put the update of the history of command in here.
-        // Handle time of command
+        // Add command to history.
         hist = (hist_t *) calloc(1, sizeof(hist_t));
         build_hist(hist, str);
         insert_hist(hist_list, hist);
@@ -458,12 +457,13 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
             close(fd[i]);
         }
         for (i = 0; i < cmds->count; i++) {
-            wait(NULL);
+            int stat_loc;
+            pid = wait(&stat_loc);
             chld_pid = 0;
         }
 
         if (is_verbose) {
-            fprintf(stderr, "exec multiple commands\n");
+            fprintf(stderr, "All commands have been executed\n");
         }
     }
 }
