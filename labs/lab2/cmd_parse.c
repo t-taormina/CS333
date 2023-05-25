@@ -31,8 +31,8 @@ int
 process_user_input_simple(void)
 {
     char str[MAX_STR_LEN] = {'\0'};
-    char prompt[PROMPT_LEN] = {'\0'};
-    char cwd[60] = {'\0'};
+    char prompt[MAX_STR_LEN+50] = {'\0'};
+    char cwd[MAX_STR_LEN] = {'\0'};
     char host_name[20] = {'\0'};
     char *ret_val = NULL;
     char *raw_cmd = NULL;
