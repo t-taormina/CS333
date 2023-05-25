@@ -10,8 +10,8 @@ CFLAGS = $(DEBUG) -Wall -Wshadow -Wunreachable-code -Wredundant-decls\
 
 PROG1 = psush
 PROG2 = cmd_parse
-
 PROGS = $(PROG1)  
+
 INCLUDES = cmd_parse.h
 
 all: $(PROGS)
@@ -32,7 +32,7 @@ test:
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out.txt ./psush 
 
 tar: 
-	tar cvfa bin_files_taormina.tar.gz *.[ch] [mM]akefile
+	tar cvfa taormina_lab3_cs333.tar.gz *.[ch] [mM]akefile
 
 open: 
 	vim *.c *.h Makefile -p

@@ -1,5 +1,5 @@
 /* Tyler Taormina - taormina@pdx.edu */
-/* CS333 PSUsh program - Lab 2*/
+/* CS333 PSUsh program - Lab 3*/
 /* Credits: rchaney@pdx.edu*/
 
 
@@ -22,6 +22,7 @@
 # define REDIR_OUT   ">"
 
 # define PROMPT_STR "PSUsh"
+
 
 // This enumeration is used when determining if the re direction
 // characters (the < and >) were used on a command.

@@ -1,5 +1,5 @@
 /* Tyler Taormina - taormina@pdx.edu */
-/* CS333 PSUsh program - Lab 2*/
+/* CS333 PSUsh program - Lab 3*/
 /* Credits: rchaney@pdx.edu*/
 
 
@@ -28,4 +28,3 @@ main( int argc, char *argv[] )
 
     return ret;
 }
-

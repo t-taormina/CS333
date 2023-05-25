@@ -1,5 +1,5 @@
 /* Tyler Taormina - taormina@pdx.edu */
-/* CS333 PSUsh program - Lab 2*/
+/* CS333 PSUsh program - Lab 3*/
 /* Credits: rchaney@pdx.edu*/
 
 
@@ -19,6 +19,7 @@
 
 #define PROMPT_LEN 100
 #define MAX_HISTORY 15
+
 
 // I have this a global so that I don't have to pass it to every
 // function where I might want to use it. Yes, I know global variables
@@ -252,7 +253,7 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
                     fprintf(stderr, "in child process\n");
                 }
 
-                // Check for redirect and alter stdout/stdin as needed
+                // Redirect stdout to file
                 if (REDIRECT_FILE == cmd->output_dest) {
                     int ofd;
 
@@ -270,6 +271,7 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
                     close(ofd);
                 }
 
+                // Redirect stdin to file
                 if (REDIRECT_FILE == cmd->input_src) {
                     int ifd;
 
@@ -292,7 +294,8 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
                 }
 
                 i = 1;
-                size = cmd->param_count + 2; /* +2 for the command and the null*/
+                /* +2 for the command and the trailing null byte*/
+                size = cmd->param_count + 2; 
                 c_argv = (char **) calloc((size),sizeof(char *));
                 c_argv[0] = cmd->cmd;
                 for(param = cmd->param_list; param ; param = param->next) {
@@ -335,16 +338,11 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
 
         /* Create pipes */
         for (i = 0; i < cmds->count; i++) {
-            /* 
-             * EXPLAIN pipe(fd + i * 2) -> 
-             */
             if (pipe(fd + i * 2) < 0) { 
                 perror("pipe error\n");
                 exit(EXIT_FAILURE);
             }
         }
-
-        /*Create processes and assign pipes*/
 
         // Indicate if there is a previous command that needs piping
         j = 0;
@@ -401,8 +399,7 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
                     }
                 }
 
-
-                // Is there a next? Set
+                // Is there a next? 
                 if (cmd->next != NULL) {
                     if ((dup2(fd[j+1], STDOUT_FILENO)) < 0) {
                         perror("dup2 error");
@@ -435,11 +432,11 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
                     c_argv[k++] = param->param;
                 }
 
-                // Exec 
                 if (is_verbose) {
                     fprintf(stderr, "execing in child process\n");
                 }
 
+                /* Execute */
                 status = execvp(c_argv[0], c_argv);
                 perror("child failed exec");
                 fprintf(stderr, "*** %d: %s failed %d ***\n", pid, c_argv[0], status);  
@@ -456,6 +453,7 @@ exec_commands(cmd_list_t *cmds, hist_list_t *hist_list)
         for (i = 0; i < cmds->count * 2; i++) {
             close(fd[i]);
         }
+
         for (i = 0; i < cmds->count; i++) {
             int stat_loc;
             pid = wait(&stat_loc);
@@ -614,7 +612,7 @@ insert_cmd(cmd_list_t *cmd_list, cmd_t *cmd, char *raw_cmd, int *count)
     cmd_list->count++;
 }
 
-// Show the fully parsed command line in a nice easy to read and digest format.
+// Show the fully parsed command line in a nice easy to read format.
 void
 print_cmd(cmd_t *cmd)
 {
@@ -669,7 +667,6 @@ sigint_handler(__attribute__((unused)) int sig)
     }
     chld_pid = 0;
 }
-
 
 // Remember how I told you that use of alloca() is
 // dangerous? You can trust me. I'm a professional.
