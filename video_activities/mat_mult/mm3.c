@@ -12,7 +12,6 @@
 #include <pthread.h>
 
 
-
 #ifndef MAX_DIM
 # define MAX_DIM 4000
 #endif // MAX_DIM
