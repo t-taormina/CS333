@@ -86,6 +86,7 @@ output_mat(float **mat)
     int j = -1;
 
 #define FILE_NAME "mm4.txt"
+
     op = fopen(FILE_NAME, "w");
     if (op == NULL) {
         perror("could not open file: " FILE_NAME);
