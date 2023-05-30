@@ -31,7 +31,7 @@ static int num_threads = 1;
 float **alloc_matrix(void);
 void free_matrix(float **);
 void init(float **, float **, float **);
-void op_mat(float **);
+void output_mat(float **);
 void *mult(void *);
 double elapse_time(struct timeval *, struct timeval *);
 int get_next_row(void);
@@ -79,7 +79,7 @@ init(float **mat1, float **mat2, float **res)
 }
 
 void 
-op_mat(float **mat)
+output_mat(float **mat)
 {
     FILE *op = NULL;
     int i = -1;
@@ -123,7 +123,6 @@ mult(void *vid)
             }
         }
     }
-
     pthread_exit(EXIT_SUCCESS);
 }
 
@@ -194,7 +193,6 @@ main(int argc, char **argv)
     gettimeofday(&et1, NULL);
 
     init(matrix1, matrix2, result);
-    // Create threads
     threads = malloc(num_threads * sizeof(pthread_t));
 
     gettimeofday(&et2, NULL);
@@ -209,7 +207,7 @@ main(int argc, char **argv)
     //mult();
     gettimeofday(&et3, NULL);
 
-    op_mat(result);
+    output_mat(result);
 
     gettimeofday(&et4, NULL);
     free_matrix(matrix1);
