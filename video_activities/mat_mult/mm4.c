@@ -124,8 +124,6 @@ mult(void *vid)
         }
     }
 
-    //long tid = (long) (vid);
-
     pthread_exit(EXIT_SUCCESS);
 }
 
