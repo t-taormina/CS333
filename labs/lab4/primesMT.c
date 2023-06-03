@@ -12,19 +12,48 @@
 #include <stdint.h>
 //#include <sys/param.h>
 
-
 #include "sieveOE.h"
 
+#define OPTIONS "t:u:hv"
+//t - user defined number of threads
+//u - upper bound prime numbers that are displayed
+//v - verbose
+//h - help
 
-// I have this a global so that I don't have to pass it to every
-// function where I might want to use it. Yes, I know global variables
-// are frowned upon, but there are a couple of times where they can use
-// their power for good. This is one.
 extern unsigned short is_verbose;
 
 int 
 main( int argc, char *argv[] )
 {
+    
+    {
+        int opt = -1;
+        while ((opt = getopt(argc, argv, "t:d:h")) != -1) {
+            switch (opt) {
+                case 't': 
+                    //num_threads = atoi(optarg);
+                    // ignore for now
+                    break;
+
+                case 'u':
+                    //dim = atoi(optarg);
+                    break;
+
+                case 'h':
+                    printf("%s: -t # -d #\n", argv[0]);
+                    printf("\t-t #: number of threads\n");
+                    printf("\t-u #: upper bound for prime numbers displayed\n");
+                    exit(0);
+                    break;
+
+                default: /* '?' */
+                    exit(EXIT_FAILURE);
+                    break;
+            }
+        }
+    }
+
+
     printf("hello, world!\n");
     return EXIT_SUCCESS;
 }
