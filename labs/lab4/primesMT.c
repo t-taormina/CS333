@@ -9,10 +9,11 @@
 #include <getopt.h>
 #include <sys/time.h>
 #include <pthread.h>
+#include <stdint.h>
 //#include <sys/param.h>
 
 
-//#include ".h"
+#include "sieveOE.h"
 
 
 // I have this a global so that I don't have to pass it to every

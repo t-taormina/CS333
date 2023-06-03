@@ -10,19 +10,21 @@ CFLAGS = $(DEBUG) -Wall -Wshadow -Wextra -Wunreachable-code -Wredundant-decls \
 		-Wunsafe-loop-optimizations -Wuninitialized $(PTHREAD)
 
 PROG1 = primesMT
-PROG2 = 
+PROG2 = sieveOE
 PROGS = $(PROG1)  
 
-INCLUDES = primesMT.h
+INCLUDES = sieveOE.h
 
 all: $(PROGS)
 
-$(PROG1): $(PROG1).o 
+$(PROG1): $(PROG1).o $(PROG2).o
 	$(CC) $(CFLAGS) -o $@ $^
 
-$(PROG1).o: $(PROG1).c
+$(PROG1).o: $(PROG1).c $(INCLUDES)
 	$(CC) $(CFLAGS) -c $<
-#$(INCLUDES)
+
+$(PROG2).o: $(PROG2).c $(INCLUDES)
+	$(CC) $(CFLAGS) -c $<
 
 clean cls: 
 	rm -f $(PROGS) *.o *~ \#*
