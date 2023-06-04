@@ -14,7 +14,6 @@
 
 #include "sieveOE.h"
 
-#define OPTIONS "t:u:hv"
 //t - user defined number of threads
 //u - upper bound prime numbers that are displayed
 //v - verbose
@@ -25,35 +24,7 @@ extern unsigned short is_verbose;
 int 
 main( int argc, char *argv[] )
 {
-    
-    {
-        int opt = -1;
-        while ((opt = getopt(argc, argv, "t:d:h")) != -1) {
-            switch (opt) {
-                case 't': 
-                    //num_threads = atoi(optarg);
-                    // ignore for now
-                    break;
-
-                case 'u':
-                    //dim = atoi(optarg);
-                    break;
-
-                case 'h':
-                    printf("%s: -t # -d #\n", argv[0]);
-                    printf("\t-t #: number of threads\n");
-                    printf("\t-u #: upper bound for prime numbers displayed\n");
-                    exit(0);
-                    break;
-
-                default: /* '?' */
-                    exit(EXIT_FAILURE);
-                    break;
-            }
-        }
-    }
-
-
-    printf("hello, world!\n");
+    process_cmd_line(argc, argv);
+    check_verbose();
     return EXIT_SUCCESS;
 }

@@ -15,4 +15,6 @@ typedef struct BitBlock_s {
     pthread_mutex_t mutex;
 } BitBlock_t; 
 
+int check_verbose(void);
+int process_cmd_line(int argc, char **argv);
 #endif // _SIEVEOE_H
