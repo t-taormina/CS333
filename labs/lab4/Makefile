@@ -27,10 +27,10 @@ $(PROG2).o: $(PROG2).c $(INCLUDES)
 	$(CC) $(CFLAGS) -c $<
 
 clean cls: 
-	rm -f $(PROGS) *.o *~ \#*
+	rm -f $(PROGS) *.o *~ \#* *.txt
 
 test:
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out.txt ./primesMT
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out.txt ./primesMT && tail valgrind-out.txt
 
 tar: 
 	tar cvfa taormina_lab4_cs333.tar.gz *.[ch] [mM]akefile
