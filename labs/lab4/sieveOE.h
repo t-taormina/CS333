@@ -21,4 +21,5 @@ BitBlock_t *allocate_bits(void);
 void init(BitBlock_t *);
 void free_memory(BitBlock_t *);
 void print_bits(BitBlock_t *);
+void mark_bits(BitBlock_t *);
 #endif // _SIEVEOE_H

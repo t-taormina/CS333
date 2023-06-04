@@ -82,6 +82,15 @@ print_bits(BitBlock_t *arr)
     printf("\n");
 }
 
+void 
+mark_bits(BitBlock_t *arr)
+{
+    int i, j, k;
+
+    for (i = 0; i < array_size; i++) {
+    }
+}
+
 int 
 process_cmd_line(int argc, char **argv)
 {

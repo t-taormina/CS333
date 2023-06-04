@@ -22,7 +22,7 @@
 extern unsigned short is_verbose;
 
 int 
-main( int argc, char *argv[] )
+main( int argc, char **argv)
 {
     BitBlock_t *bits = NULL;
 
