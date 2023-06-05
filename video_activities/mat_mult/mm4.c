@@ -2,7 +2,7 @@
 // CS333 Matrix Multiplication Video Activities
 // Multi Threading with Dynamic Work Allocation
 
-//gcc -g -Wall -o mm4 mm4.c -pthread
+/*  gcc -g -Wall -o mm4 mm4.c -pthread  */
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -1,6 +1,5 @@
 /* Tyler Taormina - taormina@pdx.edu */
 /* CS333 primesMT program - Lab 4 */
-/* Credits: rchaney@pdx.edu */
 
 #include <stdio.h>
 #include <string.h>
@@ -13,11 +12,6 @@
 //#include <sys/param.h>
 
 #include "sieveOE.h"
-
-//t - user defined number of threads
-//u - upper bound prime numbers that are displayed
-//v - verbose
-//h - help
 
 extern unsigned short is_verbose;
 

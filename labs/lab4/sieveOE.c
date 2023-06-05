@@ -1,6 +1,5 @@
 /* Tyler Taormina - taormina@pdx.edu */
 /* CS333 primesMT program - Lab 4*/
-/* Credits: rchaney@pdx.edu*/
 
 #include <stdio.h>
 #include <string.h>
@@ -16,7 +15,12 @@
 
 #include "sieveOE.h"
 
-#define OPTIONS "t:u:hv"
+#define OPTIONS "t:u:vh"
+//t - user defined number of threads
+//u - upper bound prime numbers that are displayed
+//v - verbose
+//h - help
+
 #define DEFAULT 100
 
 BitBlock_t *bits = NULL;
