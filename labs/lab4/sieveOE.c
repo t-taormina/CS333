@@ -19,10 +19,11 @@
 #define OPTIONS "t:u:hv"
 #define DEFAULT 100
 
+BitBlock_t *bits = NULL;
 unsigned short is_verbose = 0;
 int num_threads = 1;
 int array_size = 1;
-int max_prime = DEFAULT;
+uint32_t max_prime = DEFAULT;
 
 
 int
@@ -34,60 +35,87 @@ check_verbose(void)
     return 0;
 }
 
-BitBlock_t *
+void 
 allocate_bits(void)
 {
-    BitBlock_t *temp_bits = NULL;
-
-    if (max_prime <= 0) {
-        return temp_bits;
+    if (max_prime > 0) {
+        if (max_prime <= 32) {
+            bits = malloc(array_size * sizeof(BitBlock_t));
+        } else {
+            array_size = (max_prime / 32) + 1;
+            bits = malloc(array_size * sizeof(BitBlock_t));
+            //printf("array size: %d\n", array_size);
+        }
     }
-    if (max_prime <= 32) {
-        temp_bits = malloc(array_size * sizeof(BitBlock_t));
-    } else {
-        array_size = (max_prime / 32) + 1;
-        temp_bits = malloc(array_size * sizeof(BitBlock_t));
-        //printf("array size: %d\n", array_size);
-    }
-    return temp_bits;
 }
 
 void 
-init(BitBlock_t *arr)
+init_bits(void)
 {
     int i;
     for (i = 0; i < array_size; i++) {
-        arr[i].bits = 0;
+        bits[i].bits = 0;
     }
 }
 
 void 
-free_memory(BitBlock_t *arr)
+free_memory(void)
 {
-    if (NULL != arr) {
-        free(arr);
-        arr = NULL;
+    if (NULL != bits) {
+        free(bits);
+        bits = NULL;
     }
 }
 
 void 
-print_bits(BitBlock_t *arr)
+print_primes(void)
 {
-    if (NULL == arr) {
+    int index, bit_location;
+    uint32_t i;
+
+    uint32_t mask = 0x0;
+
+    if (NULL == bits) {
         return;
     }
-    for (int i = 0; i < array_size; i++) {
-        printf("%d\n", arr[i].bits);
+    for (i = 0; i < max_prime; i++) {
+        index = i / 32;
+        bit_location = i % 32;
+        mask = 0x1 << (bit_location);
+        if (0 == (mask & bits[index].bits)){
+            printf("%d\n", i);
+        }
     }
     printf("\n");
 }
 
 void 
-mark_bits(BitBlock_t *arr)
+mark_bits(void)
 {
-    int i, j, k;
+    int index, bit_location;
+    uint32_t i, k;
 
-    for (i = 0; i < array_size; i++) {
+    uint32_t mask = 0x1;
+
+    // 0 & 1 are not prime so we mark them with a 1 (1 == not prime)
+    bits[0].bits = mask | bits[0].bits;
+    mask = 0x1 << 1;
+    bits[0].bits = mask | bits[0].bits;
+
+    for (i = 2; i < max_prime; i++) {
+        index = i / 32;
+        bit_location = i % 32;
+        mask = 0x1 << (bit_location);
+        if (0 == (mask & bits[index].bits)) {
+            for (k = i + 1; k < max_prime; k++) {
+                if (0 == k % i) {
+                index = k / 32;
+                bit_location = k % 32;
+                mask = 0x1 << (bit_location);
+                bits[index].bits = mask | bits[index].bits;
+                }
+            }
+        }
     }
 }
 

@@ -24,19 +24,20 @@ extern unsigned short is_verbose;
 int 
 main( int argc, char **argv)
 {
-    BitBlock_t *bits = NULL;
+    pthread_t *threads = NULL;
 
     process_cmd_line(argc, argv);
     /* Allocate bit structures based on max prime */
-    bits = allocate_bits();
-    init(bits);
+    allocate_bits();
+    init_bits();
     
     /* Mark non prime numbers*/
+    mark_bits();
 
     /* Output non marked numbers */
-    print_bits(bits);
+    print_primes();
 
     /* Deallocate bit structures */
-    free_memory(bits);
+    free_memory();
     return EXIT_SUCCESS;
 }

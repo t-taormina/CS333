@@ -17,9 +17,9 @@ typedef struct BitBlock_s {
 
 int check_verbose(void);
 int process_cmd_line(int , char **);
-BitBlock_t *allocate_bits(void);
-void init(BitBlock_t *);
-void free_memory(BitBlock_t *);
-void print_bits(BitBlock_t *);
-void mark_bits(BitBlock_t *);
+void allocate_bits(void);
+void init_bits(void);
+void free_memory(void);
+void print_primes(void);
+void mark_bits(void);
 #endif // _SIEVEOE_H
