@@ -22,6 +22,6 @@ void init_bits(void);
 void free_memory(void);
 void free_threads(void);
 void print_primes(void);
-void mark_bits(void);
+void *mark_bits(void *);
 void sieve_of_eratosthenes(void);
 #endif // _SIEVEOE_H

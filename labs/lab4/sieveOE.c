@@ -64,7 +64,6 @@ allocate_bits(void)
         } else {
             array_size = (max_prime / 32) + 1;
             bits = malloc(array_size * sizeof(BitBlock_t));
-            //printf("array size: %d\n", array_size);
         }
     }
 }
@@ -72,9 +71,29 @@ allocate_bits(void)
 void 
 init_bits(void)
 {
-    int i;
+    uint32_t k;
+    int i, index, bit_location;
+
+    uint32_t mask = 0x1;
+
     for (i = 0; i < array_size; i++) {
         bits[i].bits = 0;
+        //bits[i].mutex = PTHREAD_MUTEX_INITIALIZER;
+    }
+
+    // 0 & 1 are not prime so we mark them with a 1 (1 == not prime)
+    bits[0].bits = mask | bits[0].bits;
+    mask = 0x1 << 1;
+    bits[0].bits = mask | bits[0].bits;
+
+    /* Mark all even numbers as not prime */
+    for (k = 4; k < max_prime; k++) {
+        if (0 == k % 2) {
+            index = k / 32;
+            bit_location = k % 32;
+            mask = 0x1 << (bit_location);
+            bits[index].bits = mask | bits[index].bits;
+        }
     }
 }
 
@@ -112,42 +131,52 @@ print_primes(void)
 void
 sieve_of_eratosthenes(void)
 {
-    /* Use the number of threads to break the bit array into evenish sections */
-    /* start a loop from 2 - upper limit of primes desired */
-    /* */
-    /* */
-    /* */
+    long tid, start;
 
+    if (0 == num_threads) {
+        return;
+    }
+
+    threads = malloc(num_threads * sizeof(pthread_t));
+
+    start = 3;
+    for (tid = 0; tid < num_threads; tid++) {
+        pthread_create(&threads[tid], NULL, mark_bits, (void *) start);
+        start += 2;
+    }
+
+    for (tid = 0; tid < num_threads; tid++) {
+        pthread_join(threads[tid], NULL);
+    }
 }
 
-void 
-mark_bits(void)
+void *
+mark_bits(void *vid)
 {
     int index, bit_location;
     uint32_t i, k;
 
     uint32_t mask = 0x1;
+    long start = (long) (vid);
 
-    // 0 & 1 are not prime so we mark them with a 1 (1 == not prime)
-    bits[0].bits = mask | bits[0].bits;
-    mask = 0x1 << 1;
-    bits[0].bits = mask | bits[0].bits;
-
-    for (i = 2; i < max_prime; i++) {
+    for (i = start; i < max_prime; i += (num_threads * 2) ) {
         index = i / 32;
         bit_location = i % 32;
         mask = 0x1 << (bit_location);
+        //pthread_mutex_lock(&mutex);
         if (0 == (mask & bits[index].bits)) {
             for (k = i + 1; k < max_prime; k++) {
                 if (0 == k % i) {
-                index = k / 32;
-                bit_location = k % 32;
-                mask = 0x1 << (bit_location);
-                bits[index].bits = mask | bits[index].bits;
+                    index = k / 32;
+                    bit_location = k % 32;
+                    mask = 0x1 << (bit_location);
+                    bits[index].bits = mask | bits[index].bits;
                 }
             }
         }
+        //pthread_mutex_unlock(&mutex);
     }
+    pthread_exit(EXIT_SUCCESS);
 }
 
 int 
@@ -159,6 +188,10 @@ process_cmd_line(int argc, char **argv)
             switch (opt) {
                 case 't': 
                     num_threads = atoi(optarg);
+                    if (0 == num_threads) {
+                        printf("You can't use 0 threads, defaulting to 1\n");
+                        num_threads = 1;
+                    }
                     // ignore for now
                     printf("\t-t #: number of threads\n");
                     printf("Num threads entered: %d\n", num_threads);
