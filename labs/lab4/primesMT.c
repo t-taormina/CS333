@@ -18,20 +18,21 @@ extern unsigned short is_verbose;
 int 
 main( int argc, char **argv)
 {
-    pthread_t *threads = NULL;
 
     process_cmd_line(argc, argv);
     /* Allocate bit structures based on max prime */
     allocate_bits();
     init_bits();
+    allocate_threads();
     
-    /* Mark non prime numbers*/
-    mark_bits();
+    /* start the algorithm */
+    sieve_of_eratosthenes();
 
     /* Output non marked numbers */
     print_primes();
 
     /* Deallocate bit structures */
     free_memory();
+    free_threads();
     return EXIT_SUCCESS;
 }

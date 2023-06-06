@@ -24,6 +24,7 @@
 #define DEFAULT 100
 
 BitBlock_t *bits = NULL;
+pthread_t *threads = NULL;
 unsigned short is_verbose = 0;
 int num_threads = 1;
 int array_size = 1;
@@ -37,6 +38,21 @@ check_verbose(void)
         printf("verbose enabled\n");
     }
     return 0;
+}
+
+void
+allocate_threads(void)
+{    
+    if (num_threads > 0) {
+        threads = malloc(num_threads * sizeof(pthread_t));
+    }
+}
+
+void free_threads(void)
+{
+    if (NULL != threads) {
+        free(threads);
+    }
 }
 
 void 
@@ -91,6 +107,17 @@ print_primes(void)
         }
     }
     printf("\n");
+}
+
+void
+sieve_of_eratosthenes(void)
+{
+    /* Use the number of threads to break the bit array into evenish sections */
+    /* start a loop from 2 - upper limit of primes desired */
+    /* */
+    /* */
+    /* */
+
 }
 
 void 
