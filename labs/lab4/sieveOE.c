@@ -163,9 +163,8 @@ mark_bits(void *vid)
         index = i / 32;
         bit_location = i % 32;
         mask = 0x1 << (bit_location);
-        //pthread_mutex_lock(&mutex);
         if (0 == (mask & bits[index].bits)) {
-            for (k = i + 1; k < max_prime; k++) {
+            for (k = i + 1; k < max_prime; k+= i) {
                 if (0 == k % i) {
                     index = k / 32;
                     bit_location = k % 32;
@@ -174,7 +173,6 @@ mark_bits(void *vid)
                 }
             }
         }
-        //pthread_mutex_unlock(&mutex);
     }
     pthread_exit(EXIT_SUCCESS);
 }
@@ -193,15 +191,10 @@ process_cmd_line(int argc, char **argv)
                         num_threads = 1;
                     }
                     // ignore for now
-                    printf("\t-t #: number of threads\n");
-                    printf("Num threads entered: %d\n", num_threads);
                     break;
 
                 case 'u':
-                     max_prime = atoi(optarg);
-                    // ignore for now
-                    printf("\t-u #: display prime numbers <= argument passed\n");
-                    printf("max prime entered: %d\n", max_prime);
+                    max_prime = atoi(optarg);
                     break;
 
                 case 'h':
