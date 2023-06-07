@@ -3,6 +3,7 @@ mystat
 *.tar
 *.tar.gz
 *.bin
+*.pdf
 .DS_Store
 rchaney_OP
 psush
