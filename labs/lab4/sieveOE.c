@@ -9,6 +9,7 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <time.h>
+#include <math.h>
 #include <signal.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -50,9 +51,7 @@ allocate_threads(void)
 
 void free_threads(void)
 {
-    if (NULL != threads) {
-        free(threads);
-    }
+    if (NULL != threads) free(threads);
 }
 
 void 
@@ -78,6 +77,7 @@ init_bits(void)
 
     for (i = 0; i < array_size; i++) {
         bits[i].bits = 0;
+        pthread_mutex_init(&bits[i].mutex, NULL);
     }
 
     // 0 & 1 are not prime so we mark them with a 1 (1 == not prime)
@@ -99,10 +99,7 @@ init_bits(void)
 void 
 free_memory(void)
 {
-    if (NULL != bits) {
-        free(bits);
-        bits = NULL;
-    }
+    if (NULL != bits) free(bits);
 }
 
 void 
@@ -156,38 +153,36 @@ mark_bits(void *vid)
 
     uint32_t mask = 0x1;
     long start = (long) (vid);
+    long sqrt_max = (sqrt(max_prime) + 1);
 
-    for (i = start; i < max_prime; i += (num_threads * 2) ) {
+    for (i = start; i < sqrt_max; i += (num_threads * 2) ) {
         o_index = i / 32;
         bit_location = i % 32;
         mask = 0x1 << (bit_location);
-        pthread_mutex_init(&bits[o_index].mutex, NULL);
 
-        pthread_mutex_lock(&bits[o_index].mutex);
-        if (0 == (mask & bits[o_index].bits)) {
-            for (k = (2 * i); k < max_prime; k++) {
+        //pthread_mutex_lock(&bits[o_index].mutex);
+        //if (0 == (mask & bits[o_index].bits))
+        {
+            for (k = (2 * i); k < max_prime; k += i) {
                 if (0 == k % i) {
                     i_index = k / 32;
                     bit_location = k % 32;
                     mask = 0x1 << (bit_location);
-                    if (o_index != i_index) {
-                        pthread_mutex_unlock(&bits[o_index].mutex);
+                    //if (o_index != i_index)
+                    {
+                        //pthread_mutex_unlock(&bits[o_index].mutex);
                         pthread_mutex_lock(&bits[i_index].mutex);
                         bits[i_index].bits = mask | bits[i_index].bits;
                         pthread_mutex_unlock(&bits[i_index].mutex);
-                    } else {
+                    }
+                    /*
+                    else {
                         bits[o_index].bits = mask | bits[o_index].bits;
                     }
+                    */
                 }
             }
-        } else {
-            pthread_mutex_unlock(&bits[o_index].mutex);
-        }
-        /*
-        else {
-            pthread_mutex_unlock(&bits[index].mutex);
-        }
-        */
+        } 
     }
     pthread_exit(EXIT_SUCCESS);
 }
