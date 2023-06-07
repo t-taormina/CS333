@@ -4,6 +4,7 @@ mystat
 *.tar.gz
 *.bin
 *.pdf
+*.zsh
 .DS_Store
 rchaney_OP
 psush
