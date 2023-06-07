@@ -23,7 +23,6 @@ main( int argc, char **argv)
     /* Allocate bit structures based on max prime */
     allocate_bits();
     init_bits();
-    allocate_threads();
     
     /* start the algorithm */
     sieve_of_eratosthenes();

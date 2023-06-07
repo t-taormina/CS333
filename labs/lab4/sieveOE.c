@@ -78,7 +78,6 @@ init_bits(void)
 
     for (i = 0; i < array_size; i++) {
         bits[i].bits = 0;
-        //bits[i].mutex = PTHREAD_MUTEX_INITIALIZER;
     }
 
     // 0 & 1 are not prime so we mark them with a 1 (1 == not prime)
@@ -125,7 +124,6 @@ print_primes(void)
             printf("%d\n", i);
         }
     }
-    printf("\n");
 }
 
 void
@@ -153,26 +151,43 @@ sieve_of_eratosthenes(void)
 void *
 mark_bits(void *vid)
 {
-    int index, bit_location;
+    int o_index, i_index, bit_location;
     uint32_t i, k;
 
     uint32_t mask = 0x1;
     long start = (long) (vid);
 
     for (i = start; i < max_prime; i += (num_threads * 2) ) {
-        index = i / 32;
+        o_index = i / 32;
         bit_location = i % 32;
         mask = 0x1 << (bit_location);
-        if (0 == (mask & bits[index].bits)) {
-            for (k = i + 1; k < max_prime; k+= i) {
+        pthread_mutex_init(&bits[o_index].mutex, NULL);
+
+        pthread_mutex_lock(&bits[o_index].mutex);
+        if (0 == (mask & bits[o_index].bits)) {
+            for (k = (2 * i); k < max_prime; k++) {
                 if (0 == k % i) {
-                    index = k / 32;
+                    i_index = k / 32;
                     bit_location = k % 32;
                     mask = 0x1 << (bit_location);
-                    bits[index].bits = mask | bits[index].bits;
+                    if (o_index != i_index) {
+                        pthread_mutex_unlock(&bits[o_index].mutex);
+                        pthread_mutex_lock(&bits[i_index].mutex);
+                        bits[i_index].bits = mask | bits[i_index].bits;
+                        pthread_mutex_unlock(&bits[i_index].mutex);
+                    } else {
+                        bits[o_index].bits = mask | bits[o_index].bits;
+                    }
                 }
             }
+        } else {
+            pthread_mutex_unlock(&bits[o_index].mutex);
         }
+        /*
+        else {
+            pthread_mutex_unlock(&bits[index].mutex);
+        }
+        */
     }
     pthread_exit(EXIT_SUCCESS);
 }
