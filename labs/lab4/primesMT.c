@@ -32,6 +32,5 @@ main( int argc, char **argv)
 
     /* Deallocate bit structures */
     free_memory();
-    free_threads();
     return EXIT_SUCCESS;
 }

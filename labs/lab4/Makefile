@@ -3,6 +3,7 @@
 CC = gcc
 DEBUG = -g
 DEFINES = 
+MATH = -lm
 PTHREAD = -pthread
 CFLAGS = $(DEBUG) -Wall -Wshadow -Wextra -Wunreachable-code -Wredundant-decls \
 		-Wmissing-declarations -Wold-style-definition -Wmissing-prototypes \
@@ -18,7 +19,7 @@ INCLUDES = sieveOE.h
 all: $(PROGS)
 
 $(PROG1): $(PROG1).o $(PROG2).o
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^ $(MATH)
 
 $(PROG1).o: $(PROG1).c $(INCLUDES)
 	$(CC) $(CFLAGS) -c $<

@@ -44,19 +44,22 @@ check_verbose(void)
 void
 allocate_threads(void)
 {    
+    if (is_verbose) {
+        printf("Allocating threads array\n");
+    }
+ 
     if (num_threads > 0) {
         threads = malloc(num_threads * sizeof(pthread_t));
     }
 }
 
-void free_threads(void)
-{
-    if (NULL != threads) free(threads);
-}
-
 void 
 allocate_bits(void)
 {
+    if (is_verbose) {
+        printf("Allocating bits array\n");
+    }
+ 
     if (max_prime > 0) {
         if (max_prime <= 32) {
             bits = malloc(array_size * sizeof(BitBlock_t));
@@ -100,6 +103,7 @@ void
 free_memory(void)
 {
     if (NULL != bits) free(bits);
+    if (NULL != threads) free(threads);
 }
 
 void 
@@ -148,7 +152,7 @@ sieve_of_eratosthenes(void)
 void *
 mark_bits(void *vid)
 {
-    int o_index, i_index, bit_location;
+    int index, bit_location;
     uint32_t i, k;
 
     uint32_t mask = 0x1;
@@ -156,33 +160,16 @@ mark_bits(void *vid)
     long sqrt_max = (sqrt(max_prime) + 1);
 
     for (i = start; i < sqrt_max; i += (num_threads * 2) ) {
-        o_index = i / 32;
-        bit_location = i % 32;
-        mask = 0x1 << (bit_location);
-
-        //pthread_mutex_lock(&bits[o_index].mutex);
-        //if (0 == (mask & bits[o_index].bits))
-        {
-            for (k = (2 * i); k < max_prime; k += i) {
-                if (0 == k % i) {
-                    i_index = k / 32;
-                    bit_location = k % 32;
-                    mask = 0x1 << (bit_location);
-                    //if (o_index != i_index)
-                    {
-                        //pthread_mutex_unlock(&bits[o_index].mutex);
-                        pthread_mutex_lock(&bits[i_index].mutex);
-                        bits[i_index].bits = mask | bits[i_index].bits;
-                        pthread_mutex_unlock(&bits[i_index].mutex);
-                    }
-                    /*
-                    else {
-                        bits[o_index].bits = mask | bits[o_index].bits;
-                    }
-                    */
-                }
+        for (k = (2 * i); k < max_prime; k += i) {
+            if (0 == k % i) {
+                index = k / 32;
+                bit_location = k % 32;
+                mask = 0x1 << (bit_location);
+                pthread_mutex_lock(&bits[index].mutex);
+                bits[index].bits = mask | bits[index].bits;
+                pthread_mutex_unlock(&bits[index].mutex);
             }
-        } 
+        }
     }
     pthread_exit(EXIT_SUCCESS);
 }

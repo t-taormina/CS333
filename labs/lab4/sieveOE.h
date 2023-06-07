@@ -20,7 +20,6 @@ void allocate_bits(void);
 void allocate_threads(void);
 void init_bits(void);
 void free_memory(void);
-void free_threads(void);
 void print_primes(void);
 void *mark_bits(void *);
 void sieve_of_eratosthenes(void);
