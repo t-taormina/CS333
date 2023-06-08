@@ -1,18 +1,6 @@
 /* Tyler Taormina - taormina@pdx.edu */
 /* CS333 primesMT program - Lab 4*/
 
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <sys/param.h>
-#include <sys/wait.h>
-#include <sys/stat.h>
-#include <time.h>
-#include <math.h>
-#include <signal.h>
-#include <fcntl.h>
-#include <errno.h>
 
 #include "sieveOE.h"
 

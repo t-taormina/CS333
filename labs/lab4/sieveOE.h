@@ -1,5 +1,4 @@
-/* Tyler Taormina - taormina@pdx.edu */
-/* CS333 primesMT program - Lab 4*/
+/* Tyler Taormina - taormina@pdx.edu */ /* CS333 primesMT program - Lab 4*/
 
 #pragma once
 
@@ -7,7 +6,13 @@
 # define _SIEVEOE_H
 
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/time.h>
 #include <pthread.h>
+#include <math.h>
+
 
 typedef struct BitBlock_s {
     uint32_t bits;
