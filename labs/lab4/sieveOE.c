@@ -77,7 +77,7 @@ init_bits(void)
     bits[0].bits = mask | bits[0].bits;
 
     /* Mark all even numbers as not prime */
-    for (k = 4; k < max_prime; k++) {
+    for (k = 4; k < max_prime; k += 2) {
         if (0 == k % 2) {
             index = k / 32;
             bit_location = k % 32;
@@ -175,7 +175,6 @@ process_cmd_line(int argc, char **argv)
                         printf("You can't use 0 threads, defaulting to 1\n");
                         num_threads = 1;
                     }
-                    // ignore for now
                     break;
 
                 case 'u':
