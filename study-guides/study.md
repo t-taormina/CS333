@@ -485,263 +485,588 @@ O_CREAT | O_WRONLY | O_TRUNC
 1. The concept that the kernel guarantees that all of the steps in a system call are completed
 as a single operation, without being interrupted by another process or thread is called
 _____
+- atomicity
+
 2. To ensure that a process is the creator of a file, combine the ______ flag with the O_CREAT
 flag when calling open().
+- O_EXCL 
+
 3. Appending data to the end of a file is always guaranteed to be atomic.
+- False
+
 4. Describe what a race condition is for our class.
+- two processes attempting to read/write to a file at the same time
+
 5. A call to the system commands truncate() or ftruncate() always result in a zero length file.
+- false, they are truncated to size specified in param 'length'
+
 6. Describe the dup2() function.
+- duplicate an open file descriptor
+
 7. Describe the difference between parallelism and concurrency (for our class).
+- concurrency = multiple streams of execution 
+- parallel = uses multiple hardware units to get work done more efficiently
 
 ## TLPI Chapter 8
 1. Every user has a unique _________________ and an associated _____________________.
+- login name and UID
+
 2. Is it possible for the /etc/passwd file to have duplicate UID entries?
+- it is
+
 3. The primary purpose of user IDs and group IDs is to determine ______________ of various
 system resources.
+- ownership
+
 4. Identify the colon separated fields within a line from the /etc/passwd file.
 rchaney:*:2021:2000:Jesse Chaney:/u/rchaney:/bin/bash
+- rchaney, *, 2021, 2000, Jesse Chaney, /u/rchaney, /bin/bash
 
 ## TLPI Chapter 9
 1. A ______________ program allows a process to gain privileges it would not normally have.
+- setuid program
+
 2. Describe what the s means in the mode bits of the following directory listing.
 -rwsr-xr-x 1 root root 32072 Nov 20 04:37 su*
 ---s--x--x 1 root root 130720 Nov 20 12:16 sudo*
+- super user privleges
 
 ## TLPI Chapter 10
 1. On Unix system, the Epoch began on _______
+- midnight 1 Janruary, 1970
+
 2. Time zone information is compiled into the Unix kernel?
+- 
 3. In this class, the term “locale” refers to:
+- subset of a user’s environment that depends on language and cultural conventions
+
 4. The software clock on a Unix system measures time in ______
+- jiffies
+
 5. Match the 2 kinds of time in UNIX to the correct definition
-• Real time
-• Process time _____________
-_____________
+• Real time= This is the time as measured either from some standard point or 
+             from some fixed point in the life of a process
+
+• Process time= the amount of CPU time used by a process
+
 6. Regardless of geographic location, UNIX systems represent time internally as a measure of
 seconds since the Epoch.
+- True
+
 7. In UNIX, the 2038 Problem refers to ________
+- epochalypse, run out of bits
+
 8. The time() system call returns ___________
+- type time_t
+
 9. Conversion of the time_t value from a call to time() into a more detailed structure
 representing seconds, minutes, hours, days, .. is called
+- ctime
+
 10. The %D format for strftime() function says _____
+- is equivalent to “%m/%d/%y”
+
 11. The function that converts from printable form to broken-down time is _____
+- gmtime() and localtime()
+
 12. The size of a jiffy is defined by ______
-13. User CPU time is the amount of time spent executing in user mode.
+- constant HZ in kernel source code
 
-## TLPI Chapter 12
-1. Why is the /proc filesystem called a pseudo-filesystem?
-2. Describe the kcore file in /proc.
-3. Describe the loadavg file in /proc.
-4. Describe the self symbolic link in /proc.
-5. What are all the numbered directories in the /proc directory?
+13. user cpu time is the amount of time spent executing in user mode.
+- amount of time spent executing in user mode
 
-## TLPI Chapter 19
-1. The file event monitoring interface for Linux is called _____________
-2. The Linux inotify interface works across NFS mounts.
-3. Give 3 examples of file events that can be monitored with the inotify interface.
-4. Directories added in an inotify monitored directory are automatically added to the event
+## tlpi chapter 12
+1. why is the /proc filesystem called a pseudo-filesystem?
+- resides in virtual memory and a new one is created at every boot
+
+2. describe the kcore file in /proc.
+- represents the virtual memory of the system
+
+3. describe the loadavg file in /proc.
+- provides a look at the load average
+
+4. describe the self symbolic link in /proc.
+- points to the process reading the file system
+
+5. what are all the numbered directories in the /proc directory?
+- 
+
+## tlpi chapter 19
+1. the file event monitoring interface for linux is called _____________
+- inotify
+
+2. the linux inotify interface works across nfs mounts.
+- false
+
+3. give 3 examples of file events that can be monitored with the inotify interface.
+- access, delete, create, open, moved, modify, and more
+
+4. directories added in an inotify monitored directory are automatically added to the event
 notification, recursively.
-5. The inotify interface works across all POSIX compliant operating systems.
+- false, not recursively. subdirectories must have their own inotify watch
+
+5. the inotify interface works across all posix compliant operating systems.
+- false, linux only
 
 
-## TLPI Chapter 20
-1. True or False: Delivery of a signal is blocked during the execution of its handler.
-2. True or False: A signal is a synchronous notification sent to a process.
-3. If you want to reset the disposition of a signal to its default, there is a constant that can be
-used in place of a handler function. What is it?
+## tlpi chapter 20
+1. true or false: delivery of a signal is blocked during the execution of its handler.
+- true 
+
+2. true or false: a signal is a synchronous notification sent to a process.
+- false
+
+3. if you want to reset the disposition of a signal to its default, there is a
+   constant that can be used in place of a handler function. what is it?
+- SIG_DFL
+
 4. On Linux, the standard signals are numbered ____ to ____ .
+- 1 to 31
+
 5. True or False: All signals can be caught or blocked.
+- False
+
 6. Signals are sometimes described as _____________
+- interupts, notifications
+
 7. With signals, it is generally pretty easy to determine when they will arrive.
+- False
+
 8. True or False: Processes can send signals to other processes, but not itself.
+- False, can send to itself
+
 9. What types of events can cause signals to be sent to a process?
+- segfault, sigchld, sigint, sigkill
+
 10. The SIGPIPE signal means what?
+- process tries to write to a pipe, FIFO, or socket for which there is no reader
+    process
+
 11. The SIGSEGV signal represents ________
+- invalid memory reference
+
 12. The second argument to the signal() function is
+- the signal handler
+
 13. The value to use to instruct your process to ignore a signal is ________
+- SIG_IGN
+
 14. The common system C function to send a signal to another process is ____
+- kill()
+
 15. An easy way for a process to send a signal to itself is to call ___
+- raise()
+
 16. A signal mask for a process represents a set of signals whose delivery to the process is
-_____
-17. If a process receives a signal that it is currently blocked, that signal is added to the process’
-set of pending signals. When (and if) the signal is later unblocked, it is then delivered to the
-process.
+- currently blocked
+
+17. If a process receives a signal that it is currently blocked, that signal is
+    added to the process’ set of pending signals. When (and if) the signal is later
+    unblocked, it is then delivered to the process.
+- true
+
 18. True or False: The normal set of signals are queued.
+- false
+
 19. Receipt of signals can be reliably counted.
+- false
+
 20. Write some C code that will count all the SIGUSR1 signals received by a process.
+- can't be done
+
 21. The system function that will suspend a process until a signal is received is _______
+- pause()
+
 22. What UNIX command do you use to send a signal to a process?
+- kill
 
 ## TLPI Chapter 21
 1. A function the can safely be simultaneously executed by multiple threads of execution in
 the same process, is called _______
+-  
 2. A function where the implementation guarantees to be safe when called from a signal
 handler is called ______
+- async-signal-safe
+
 3. The value of errno will not change within a signal handler.
+- false 
+
 4. True or False: It is possible for signals to be lost for a process.
+- 
+
 5. All system and library functions can be safely called from within a signal handler.
+- false
+
 6. A function that employs only local variables is guaranteed to be reentrant.
+- 
+
 7. When you use the SA_RESTART flag on a signal, all system calls will be automatically
-restarted if interrupted by a signal.
+restarted on the processes behalf
+-  true
 
 ## TLPI Chapter 24
 1. After creating a child process using fork(), which runs first, the parent process or the child
 process?
+- it is indeterminant
+
 2. When successful, for the parent, fork() returns the _____ of the newly created child
 process.
+- pid of child process is returned in the parent
+- 0 is returned in the child
+
 3. It is possible to call the fork() function and not exec a new program over the child.
+- true
+
 4. The fork() system call _____ (describe it)
+- creates a new process
+
 5. When successful, the returned pid value for fork() in the child process is _____
+- 0
+
 6. For a child process to find the value of its parent's PID, it should call ______.
+- getppid()
+
 7. When fork() fails, it returns the value ______
+-  (-1) to indicate no child process was created
+
 8. After a call to fork(), the child has a copy of the parent’s file descriptors.
+- true
+
 9. A call to the vfork() command is just like a call to fork(), except faster.
-10. Applications that implicitly or explicitly rely on a particular sequence of execution in order
-to achieve correct results are open to failure due to race conditions.
+- false
+
+10. Applications that implicitly or explicitly rely on a particular sequence of
+    execution in order to achieve correct results are open to failure due to race 
+    conditions.
+- true
+
 11. A parent process may have at any one time only a single child process.
+- false
+
 12. What are “related” processes?
+- processes that stem from the same parent
 
 ## TLPI Chapter 25
 1. By convention, a termination status of _____ indicates that a process completed
-successfully.
-2. Before a call to _exit() completes, calls are made to exit handlers (atexit() and onexit()) and
-stdio buffers are flushed.
+   successfully.
+- 0 
+
+2. Before a call to _exit() completes, calls are made to exit handlers
+   (atexit() and onexit()) and stdio buffers are flushed.
+- false, this is correct for exit()
+
 3. Exit handlers are way for a process to perform cleanup before a normal _______
+- process termination via exit
+
 4. Registered exit handlers are always called before a process terminates.
-5. Exit handlers are not called if a program calls _exit() directly or if the process is terminated
-abnormally by a signal.
+- true
+
+5. Exit handlers are not called if a program calls _exit() directly or if the
+   process is terminated abnormally by a signal.
+- true
+
 6. Registering a signal handler for SIGKILL guarantees that an exit handler will be called for
 that signal.
+-
+
 7. It is not possible to register multiple exit handlers when using atexit().
-8. When a process invokes exit(), the exit handler functions are called in order of registration.
+- 
+
+8. When a process invokes exit(), the exit handler functions are called in 
+  order of registration.
+- false, reverse order of registration
+
 9. If an exit handler fails to return, either because it called _exit() or because the process was
 terminated by a signal, then the remaining exit handlers are not called.
+- 
+
 10. If an exit handler calls exit(), it may cause all of the exit handlers to be invoked again, which
 can result in an infinite recursion.
+-  true
+
 11. A child process created via fork() does not inherit a copy of its parent’s exit handler
 registrations.
+- 
+
 12. When a process performs an exec(), all exit handler registrations are retained in the new
 process.
+- they are all removed
+
 13. A (nonstandard) alternative to atexit(), provided by glibc is ______
-14. A general principle: in an application that creates child processes, typically only one of the
-processes (most often the parent) should terminate via exit(), while the other processes
-should terminate via _exit().
+- on_exit()
+
+14. A general principle: in an application that creates child processes, 
+   typically only one of the processes (most often the parent) should terminate
+   via exit(), while the other processes should terminate via _exit().
+- true
+
 15. Typically only one process of a family of processes should terminate with a call to ________,
 other processes should terminate with a call to _______.
+- exit() _exit()
+
 16. Describe the nice() system call.
+- changes the priority level of a process
+
 17. What is the return value from a call to exit()?
+- no return value
 
 ## TLPI Chapter 26
-1. On a successful call to wait(), if no (previously unwaited-for) child of the calling process has
-yet terminated, the call _______ until one of the children terminates.
+1. On a successful call to wait(), if no (previously unwaited-for) child of the
+   calling process has yet terminated, the call _______ until one of the
+   children terminates.
+- blocks
+
 2. What signal is used to terminate a zombie process?
+- a zombie process cannot be killed
+
 3. Child processes are reaped using what system call?
+- wait? sigchld?
+
 4. Like the wait() call, the waitpid() call always blocks.
+- false, if WNOHANG is specified
+
 5. A common way of reaping dead child processes is to establish a handler for the _______
 signal.
+- sigchld
+
 6. A child process that has terminated, but not yet had it parent process call wait() on it is
 called a _______
+- zombie
+
 7. In order to kill a zombie process you must ________
+- reboot the machine and let the init process kill them
+
 8. On success, a call to wait() returns _____
+- process ID of child terminated
+
 9. On failure, a call to wait() returns _____
+- (-1) and errno is set
+
 10. What does the status parameter represent in a call to wait()?
+- contains status information about hte process that terminated
+
 11. What process becomes the parent of an orphaned child process?
+- init
+
 12. What happens to a child process that terminates before its parent has had a chance to
 perform a wait()?
+- zombie process
+
 13. If your program needs to wait for a specific child process to terminate, you should call
 _________.
-14. If a large number of such zombie children are created, they will eventually fill the kernel
-process table, eventually _____
+- waitpid
+
+14. If a large number of such zombie children are created, they will eventually 
+    fill the kernel process table, eventually _____
+- causing a crash?
+
 15. Describe the difference between a zombie process and an orphan process.
+- zombies are children who are never reaped
+- orphans are running processes who's parents exited early
 
 ## TLPI Chapter 27
 1. A successful call to one of the exec() functions returns what value?
+- nothing, only returns on error
+
 2. When a call to a exec() does fail, a value in errno of EACCES means:
+- pathname argument doesn't refer to a regular file
+
 3. When a call to a exec() does fail, a value in errno of E2BIG means.
+- The total space required by the argument list and environment list exceeds the allowed maximum.
+
 4. The exec()set of commands cannot be used to execute shell scripts (interpreter scripts).
+- False
+
 5. The execve() system call loads a new program into a process’ memory.
+- loads a new environment
+
 6. During the execve() call, list what will happen with the process 4 segments:
-7. When using the execve() call, the argv parameter does not need to set argv[0] to be the
-command name.
+- they are replaced with the new process segments
+
+7. When using the execve() call, the argv parameter does not need to set argv[0]
+   to be the command name.
+- false 
+
 8. After an execve(), the process ID of the new process is changed.
+- false
+
 9. Which of the various exec() functions will search the PATH environment variable when
 called?
+- any of the functions with 'p'
+
 10. By default, all file descriptors opened by a program that calls exec() remain open across the
 exec() and are available for use by the new process.
+- true
+
 11. The new image created by a call to one of the exec() functions inherits the old process’
 signal handlers.
+- 
+
 12. What are some of the advantages of using the system() call, when possible? (list 2)
+-error handling is done for you and you don't need to handle the details of 
+fork(), exec(), wait(), exit()
+
 
 ## Pthreads tutorial
 1. When compared to the cost of creating and managing a process, a thread can be created
 with much less operating system overhead.
-2. By having main() explicitly call pthread_exit() as the last thing it does, main() will block and
-be kept alive to support the threads it created until they are done.
+- true 
+
+2. By having main() explicitly call pthread_exit() as the last thing it does, 
+   main() will block and be kept alive to support the threads it created until 
+   they are done.
+- true, also needs to join
 
 ## TLPI Chapter 29
 1. Threads allow a single process to perform multiple tasks concurrently?
+- true
+
 2. Like processes, threads are an independent stream of execution.
+- true
+ 
 3. Threads in a process do not share global memory?
+- false
+
 4. When using PThreads, each thread has its own errno variable?
+- true
+
 5. When a program makes a call to pthread_create(), the creating thread will always run first.
+- no
+
 6. In a multithreaded application, a bug in one thread can damage all of the threads in the
 process, since they share the same address space and other attributes?
+- true
+
 7. In PThreads, the thread-id is guaranteed to be unique across all processes.
+- false, only in the same process will they be unique
+
 8. The pthread_join() function waits for the thread identified by thread to ______.
+- terminate
+
 9. When we don’t care about a thread’s return status; we simply want the system to
 automatically clean up and remove the thread when it terminates, we say the thread is
-__________
-10. Some of the attributes that threads within a process share are (list 5):
+- detached
+
 11. Some of the attributes that threads within a process DONOT share are (list 3):
+- thread ID, CPU affinity, errno, signal mask, thread specific data, capabilities
+
 12. In a multi-threaded process, if one thread is blocked on I/O, all threads are blocked.
+- false
+
 13. List 2 advantages that a multi-threaded application has over a multi-process
 implementation.
-14. All Pthreads functions return 0 on success or a positive value on failure (unlike the return
-value for system function).
+- lightweight, shared memory space and file descriptors
+
+14. All Pthreads functions return 0 on success or a positive value on failure 
+    (unlike the return value for system function).
+-  not pthread_exit() returns nothing
+
 15. The 3 ways a thread may terminate are:
+- pthread_canel(), pthread_exit(), or return something
+
 16. When a thread calls exit(), only that thread actually terminates.
+- all threads terminate
+
 17. A thread can obtain its own ID using _________ call.
+- pthread_self()
+
 18. Calling pthread_join() for a thread ID that has been previously joined
 can lead to __________.
+- unpredictable behavior
+
 19. If we neglect fail to call pthread_join() on a non-detached thread,
 then, when the thread terminates, it produces the thread equivalent
 of a ________
+- zombie thread
+
 20. Unlike processes, threads are peers, any thread in a process can use pthread_join() to join
 with any other thread in the process.
-21. What is the PThreads call to “join with any thread” (as the wait() call does with processes)?
+- false
+
+21. What is the PThreads call to “join with any thread” (as the wait() call 
+    does with processes)?
+- pthread_exit() will wait for all other threads to complete but this must be 
+  from the main thread
+
 22. Once a thread has been detached, it is still possible to obtain its return status with
 pthread_join().
+- no
+
 23. What is the compiler flag you need to use to have your PThreaded code compile?
+- (-pthread)
+
 24. Any thread calling pthread_exit() will immediately exit. If no, explain.
+- no, main thread will wait for others  to join
 
 ## TLPI Chapter 30
 1. In TLIP Chapter 30, the term critical section is used to refer to a section of code that
 accesses a shared resource and whose execution should be ____
+-
+
 2. Before a statically allocated mutex can be used, it must be initialized.
+-
+
 3. On Linux, if a thread tries to lock a mutex for which it already has a lock, the default
 behavior is to __
+-
+
 4. The term mutex stands for ____
+-
+
 5. A mutex has two states (identify them)
+-
+
 6. Correctly order the steps in the typical protocol when using a mutex to control access to a
 shared resource.
+-
+
 7. To lock and unlock a mutex, we use the ______ and ______ calls.
+-
+
 8. The pthread_mutex_trylock() function is the same as pthread_mutex_lock(), except that if
 the mutex is currently locked, pthread_mutex_trylock() call will ___
+-
+
 9. What kind of condition can occur when more than one thread is locking the same set of
 mutexes?
+-
+
 10. A thread may not unlock a mutex that it did not lock.
+-
+
 11. The alternate terms ____ and ____ are sometimes used for mutex lock and unlock.
+-
+
 12. A thread may not unlock a mutex that is not currently locked.
+-
+
 13. Describe deadlock (as it relates to our class).
+-
+
 14. Use of a mutex will automatically detect and prevent deadlock.
+-
+
 15. PThread barrier locks allow all threads to reach a specific point in the program before
 continuing.
+-
+
 16. Describe a barrier lock.
+-
+
 17. Describe how readers-writers locks work.
+-
+
 18. A function is said to be thread-safe if it can _________________________
+-
+
 
 ## TLPI Chapter 31
 1. A function is said to be thread-safe if it can _______
+-
+
 2. Identify 4 POSIX functions which are not thread-safe.
+-
+
 3. Is the following code fragment thread-safe? Why or why not?
 ```c
 static int glob = 0;
@@ -759,100 +1084,215 @@ static void incr(int loops)
 
 ## TLPI Chapter 32
 1. What is the PThreads call to request a thread to terminate?
+-
+
 2. The pthread_cancel() call will wait for the canceled thread to terminate before returning.
+-
+
 
 ## TLPI Chapter 44
 1. The oldest method of IPC on Unix is _________________
+-
+
 2. When TLPI refers to a pipe as a byte stream, it means __________
+-
+
 3. Data in a pipe can be randomly accessed using lseek()?
+-
+
 4. Attempts to read() from an empty (but open) pipe will, ___________
+-
+
 5. If the write end of a pipe is closed, then a process reading from the pipe will ____________
+-
+
 6. If multiple processes are writing to a single pipe, then it is guaranteed that their data won’t
 be intermingled if they write no more than PIPE_BUF bytes at a time.
+-
+
 7. When writing to a pipe, the call to write() will block if ____
+-
+
 8. Describe what “unnamed pipes can be used between related processes” means.
+-
+
 9. When a pipe is created, the file descriptors used for the two ends of the pipe are the next
 lowest-numbered descriptors available.
+-
+
 10. The popen() command can be used to write to and read from an executed command?
+-
+
 11. Another name for FIFO pipes is _______________
+-
+
 12. A FIFO shows up as an entry in the file system.
+-
+
 13. An unnamed pipe has ________________ persistence.
+-
+
 14. A FIFO has __________________ persistence
+-
+
 15. Once a FIFO has been created, it can be only be opened by a “related” process (subject to
 file permission checks).
+-
+
 16. A (successful) call to the pipe() system call creates how many open file descriptors?
+-
+
 17. Pipes have unlimited capacity.
+-
+
 18. Pipes are a natural way to connect filters (programs that read from stdin and write to
 stdout).
+-
+
 19. When all descriptors referring to a pipe or FIFO have been closed, any outstanding data are
-_______
+-
+
 20. When a process opens one end of a FIFO, it blocks if the other end of the FIFO has not yet
 been opened.
+-
+
 
 ## TLPI Chapter 52
 1. Describe how a POSIX message queue differs from a FIFO.
+-
+
 2. POSIX message queues are priority driven.
+-
+
 3. Like named pipes, message queues are byte streams.
+-
+
 4. Partial messages can be read from a POSIX message queue.
+-
+
 
 ## TLPI Chapter 53
 1. Semaphores were invented by whom?
+-
+
 2. A POSIX semaphore is an integer whose value is not permitted __________________
+-
+
 3. When initializing an unnamed POSIX semaphore using sem_init(), a value of 0 for the
 pshared argument indicates, the semaphore is not to be shared between the threads of the
 calling process.
+-
+
 5. The sem_destroy(sem) call is the preferred method to remove both named and unnamed
 semaphores from the system.
+-
+
 6. A POSIX unnamed semaphore can be embedded inside a data structure object.
+-
+
 7. If a process attempts to decrease the value of a POSIX semaphore below 0, then, depending
 on the function used, the call _______
+-
+
 8. The sem_post(sem) function (describe what it does):
+-
+
 9. If a blocked sem_wait() call is interrupted by a signal handler, then it
+-
+
 10. POSIX specifies two types of semaphores (list both):
+-
+
 
 ## TLPI Chapter 54
 1. POSIX shared memory allows to us to share a mapped memory region between unrelated
 processes without needing to create a corresponding mapped file.
+-
+
 2. On a Linux system, the POSIX shared memory objects will persist even after no processes
 has them open.
+-
+
 3. On a Linux system (kernel 2.4 and higher), the POSIX shared memory is stored mounted as
 file system under _______
+-
+
 4. The POSIX call shm_open(), when successful, returns a __________________
+-
+
 5. When a shared memory object space is extended, the newly added bytes are automatically
 initialized to -1.
+-
+
 6. When a new POSIX shared memory object is created, it initially has ____ length.
+-
+
 7. When opening a POSIX shared memory object, specifying O_EXCL in conjunction with
 O_CREAT is a request to ensure that the caller is the creator of the object.
+-
+
 8. Removing a shared memory object doesn’t affect existing mappings of the object, but
 prevents further shm_open() calls from opening the object.
+-
+
 9. Once the shared memory region has been mapped into the process’s virtual address space,
 it looks just like any other part of the process’s memory space.
+-
+
 10. What form of synchronization does shared memory provide?
+-
+
 
 ## TLPI Chapter 56
 1. A POSIX datagram socket doesn’t need to be connected to another socket in order to be
 used.
+-
+
 2. A socket that has been marked to allow incoming connection by calling listen() is called
 ____ (active or passive).
+-
+
 3. A stream socket is similar to using a pair of pipes to allow bidirectional communication
 between two applications.
+-
+
 4. A successful call to socket() returns a _______ (don’t just say “a socket”).
+-
+
 5. By default, a socket that has been created using socket() is _______ (active/passive).
+-
+
 6. If an application attempts to write to a POSIX stream socket which the peer application has
 closed, it will __________
+-
+
 7. If there are no pending connections when accept() is called, the call _______ until a
 connection request arrives.
+-
+
 8. In most applications that employ stream sockets, a server application performs the _______
 open, and the client performs the ________ open.
+-
+
 9. Just to make things easier, data type sizes between all systems are always the same (a C
 long data type is always 32 bits).
+-
+
 10. Modern Unix/Linux operating systems support at least 3 socket communication domains.
 What are those 3?
+-
+
 11. Since the underlying networking protocols may sometimes retransmit a data packet, the
 same POSIX datagram socket messages could arrive more than once.
+-
+
 12. Socket I/O can be performed using the conventional read() and write() system calls.
+-
+
 13. Sockets are a method of IPC that allow data to be exchanged between applications on
 different hosts connected by a network.
+-
+
 14. Complete the following table.
 Property
 Socket Type
@@ -861,61 +1301,140 @@ Datagram
 Reliable Delivery
 Message boundaries preserved
 Connection Oriented
+-
+
 15. With a stream socket, message boundaries are not preserved.
+-
+
 16. Transmission Control Protocol (TCP) is an example of datagram sockets.
+-
+
 17. When a peer application reads from a socket which has been closed, it will receive ____
+-
+
 18. When accept() returns, it creates a new socket that is connected to the peer socket that
 performed a connect().
+-
+
 19. When using datagram sockets, messages may arrive out of order, be duplicated, or not
 arrive at all.
+-
+
 20. With POSIX datagram sockets, message boundaries are preserved, but data transmission is
 not reliable.
+-
 
 ## TLPI Chapter 57
 1. UNIX domain sockets only allow communication between processes on the same host
 system.
+-
+
 2. The address family for UNIX Domain sockets is ____
+-
+
 3. When used to bind a UNIX domain socket, bind() creates
+-
+
 4. When listed with ls –F, a UNIX domain socket appends an ______ to the socket pathname.
+-
+
 5. A UNIX Domain socket may be bound to multiple pathnames.
+-
+
 6. Because UNIX Domain Sockets are pathnames, we can use the open() call to open one.
+-
+
 7. When a UNIX Domain socket is no longer required, its pathname entry should be removed
 using unlink()
+-
+
 8. When creating a UNIX Domain socket, we can bind a socket to an existing pathname.
+-
+
 9. For UNIX domain sockets, datagram transmission is carried out within the kernel, and is
 reliable.
+-
+
 10. To connect to a UNIX domain stream socket, only read permission is required on the socket
 file.
+-
+
 11. With UNIX Domain sockets, a socket pair (created with the socketpair() call) is used in a
 similar fashion to a pipe.
+-
+
 12. How do you create a UNIX Domain socket in the abstract namespace?
+-
+
 13. With UNIX Domain sockets (Linux specific), the abstract namespace are sockets that do not
 exist in the file system.
+-
+
 14. UNIX Domain sockets in the abstract namespace still need to be unlinked from the file
 system.
+-
+
 15. Which is likely to provide better performance, TCP sockets or UNIX sockets?
+-
 
 ## TLPI Chapter 59
 1. A system that is called big endian is one where the most significant byte is stored first (MSB,
 leftmost).
+-
 2. One difference between IPv4 addresses and IPv6 address is that an IPv6 address is 64 bits,
 not 32 bits like IPv4.
+-
+
 3. The inet_pton() and inet_ntop() functions are like inet_aton() and
 inet_ntoa(), but differ in that they also handle ____
+-
+
 4. The result of a successful call to getaddrinfo() is _______
+-
+
 5. The standard network byte ordering used is called ______
+-
+
 6. The terms big endian and little endian derive from ______
+-
+
 7. With UDP sockets, if the incoming datagram would overflow the receiver’s queue, then the
 datagram is __________
+-
+
 8. Two notable examples of little-endian architectures are: ________
+-
+
 9. The byte ordering used on a particular machine is called the _______
+-
+
 10. With the networking function htonl(), what does htonl actually stand for?
+-
+
 11. The process of putting data into a standard format for transmission across a network is
 referred to as ____
+-
+
 12. If IPv4 and IPv6 coexist on a host, they can share the same port-number space.
+-
+
 13. An IPv6 address is composed of __________ bits.
+-
+
 14. On success, the inet_pton() function returns ____
+-
+
 15. In the inet_pton() and inet_ntop() functions, the p stands for _____ and the n
 stands for ____
+-
+
 16. The getaddrinfo() function converts host and service names to _______
+-
+
 17. Given a host name and a service name, getaddrinfo() returns _______
+-
+
+
+
+
+
